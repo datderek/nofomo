@@ -1,0 +1,32 @@
+{
+  "name": "social-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky",
+    "lint": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --quiet --fix"
+    ],
+    "*.{json,js,ts,jsx,tsx,html}": [
+      "prettier --write --ignore-unknown"
+    ]
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@eslint/js": "^9.6.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.34.3",
+    "globals": "^15.8.0",
+    "husky": "^9.0.11",
+    "lint-staged": "^15.2.7",
+    "prettier": "3.3.2"
+  }
+}

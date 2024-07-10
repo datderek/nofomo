@@ -10,6 +10,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(express.json());
+
 app.use('/api/posts', postRouter);
 
 app.listen(port, () => {

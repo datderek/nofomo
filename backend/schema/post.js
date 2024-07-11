@@ -15,14 +15,20 @@ const schema = Joi.object({
 
   // Ensures timestamp is in the MySQL format
   eventStart: Joi.string()
-    .pattern(new RegExp('^d{4}-d{2}-d{2} d{2}:d{2}:d{2}$'))
+    .pattern(new RegExp('^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$'))
     .allow(null)
-    .message('eventStart must be in the format of `YYYY-MM-DD hh:dd:ss`'),
+    .messages({
+      'string.pattern.base':
+        '"eventStart" must be in the format of YYYY-MM-DD hh:dd:ss',
+    }),
 
   eventEnd: Joi.string()
-    .pattern(new RegExp('^d{4}-d{2}-d{2} d{2}:d{2}:d{2}$'))
+    .pattern(new RegExp('^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$'))
     .allow(null)
-    .message('eventEnd must be in the format of `YYYY-MM-DD hh:dd:ss`'),
+    .messages({
+      'string.pattern.base':
+        '"eventEnd" must be in the format of YYYY-MM-DD hh:dd:ss',
+    }),
 });
 
 module.exports = schema;

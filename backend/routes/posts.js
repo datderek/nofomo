@@ -1,39 +1,56 @@
 const express = require('express');
 const db = require('../config/database');
+const postSchema = require('../schema/post');
 
 const router = express.Router();
 
 // Create a new post
-router.post('/', async (req, res) => {
-  const { title, location, body, media, tags, eventStart, eventEnd } = req.body;
-
-  if (!title) {
-    res.status(400).send({ error: 'Missing required title' });
-    return;
-  }
+router.post('/', async (req, res, next) => {
+  const {
+    title,
+    location = null,
+    body = null,
+    media = null,
+    tags = null,
+    eventStart = null,
+    eventEnd = null,
+  } = req.body;
 
   try {
+    await postSchema.validateAsync(
+      { title, location, body, media, tags, eventStart, eventEnd },
+      { abortEarly: false }
+    );
     const sql =
       'INSERT INTO `posts` (`title`, `location`, `body`, `media`, `tags`, `event_start`, `event_end`) VALUES (?, ?, ?, ?, ?, ?, ?)';
-    const values = [
+    const [result] = await db.execute(sql, [
       title,
-      location || null,
-      body || null,
-      media || null,
-      tags || null,
-      eventStart || null,
-      eventEnd || null,
-    ];
-    const [result] = await db.execute(sql, values);
-    console.log(result);
+      location,
+      body,
+      media,
+      tags,
+      eventStart,
+      eventEnd,
+    ]);
 
     res.status(201).send({
       message: 'Post created successfully',
       title,
-      postId: result['insertId'],
+      postId: result.insertId,
     });
   } catch (err) {
-    res.status(500).send({ error: err });
+    next(err);
+  }
+});
+
+// Error handling middleware
+router.use((err, req, res, next) => {
+  if (err.isJoi) {
+    // Joi validation error
+    res.status(422).send({ error: err.details.map((e) => e.message) });
+  } else {
+    // Generic or database error
+    res.status(500).send({ error: 'Internal Server Error' });
   }
 });
 

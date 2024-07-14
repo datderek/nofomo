@@ -1,12 +1,12 @@
 import globals from "globals";
-import pluginJs from "@eslint/js";
-import reactConfig from "eslint-plugin-react/configs/recommended.js";
+import js from "@eslint/js";
+import reactHooksPlugin from "eslint-plugin-react-hooks"; // Does not have support for ESLint flat config yet
+import reactPlugin from "eslint-plugin-react";
 import prettierConfig from "eslint-config-prettier";
 
 export default [
   {
     files: ["frontend/**/*.{js,mjs,cjs,jsx}"],
-    reactConfig,
     languageOptions: { 
       parserOptions: { 
         ecmaFeatures: { 
@@ -14,7 +14,16 @@ export default [
         } 
       },
       globals: globals.browser
-    } 
+    },
+    plugins: {
+      "react": reactPlugin,
+      "react-hooks": reactHooksPlugin,
+    },
+    rules: {
+      ...reactPlugin.configs.recommended.rules,
+      ...reactPlugin.configs['jsx-runtime'].rules,
+      ...reactHooksPlugin.configs.recommended.rules,
+    }
   },
   {
     files: ["backend/**/*.js"], 
@@ -26,6 +35,6 @@ export default [
       "no-unused-vars": ["error", { "argsIgnorePattern": "next" }]
     }
   },
-  pluginJs.configs.recommended,
+  js.configs.recommended,
   prettierConfig,
 ];

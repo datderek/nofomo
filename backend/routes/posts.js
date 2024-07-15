@@ -6,7 +6,7 @@ const router = express.Router();
 
 // Create a new post
 router.post('/', async (req, res, next) => {
-  const {
+  let {
     title,
     location = null,
     body = null,
@@ -17,10 +17,13 @@ router.post('/', async (req, res, next) => {
   } = req.body;
 
   try {
-    await postSchema.validateAsync(
-      { title, location, body, media, tags, eventStart, eventEnd },
-      { abortEarly: false }
-    );
+    // Validates request body and sets empty strings (ommitted optional fields) to null
+    ({ title, location, body, media, tags, eventStart, eventEnd } =
+      await postSchema.validateAsync(
+        { title, location, body, media, tags, eventStart, eventEnd },
+        { abortEarly: false }
+      ));
+
     const sql =
       'INSERT INTO `posts` (`title`, `location`, `body`, `media`, `tags`, `event_start`, `event_end`) VALUES (?, ?, ?, ?, ?, ?, ?)';
     const [result] = await db.execute(sql, [
@@ -50,6 +53,7 @@ router.use((err, req, res, next) => {
     res.status(422).send({ error: err.details.map((e) => e.message) });
   } else {
     // Generic or database error
+    console.log(err);
     res.status(500).send({ error: 'Internal Server Error' });
   }
 });

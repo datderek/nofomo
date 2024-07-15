@@ -53,7 +53,6 @@ router.use((err, req, res, next) => {
     res.status(422).send({ error: err.details.map((e) => e.message) });
   } else {
     // Generic or database error
-    console.log(err);
     res.status(500).send({ error: 'Internal Server Error' });
   }
 });

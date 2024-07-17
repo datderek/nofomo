@@ -1,4 +1,5 @@
 import useForm from '../../hooks/useForm.jsx';
+import { useState } from 'react';
 
 export default function PostForm() {
   const initialValues = {
@@ -12,6 +13,7 @@ export default function PostForm() {
   };
 
   const [values, handleChange, resetForm] = useForm(initialValues);
+  const [errors, setErrors] = useState([]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -26,16 +28,20 @@ export default function PostForm() {
       });
 
       resetForm();
-      // TODO: Display response
-      console.log(response);
+      if (response.ok) {
+        // TODO: Redirect on success
+      } else {
+        setErrors((await response.json()).error);
+      }
     } catch (err) {
-      // TODO: Display error
-      console.log(err);
+      setErrors(err.error);
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
+      {errors && errors.map((error, index) => <p key={index}>{error}</p>)}
+
       <label htmlFor="title">Title</label>
       <input
         type="text"

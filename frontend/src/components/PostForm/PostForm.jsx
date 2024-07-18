@@ -10,8 +10,6 @@ export default function PostForm() {
     body: '',
     eventStart: '',
     eventEnd: '',
-    media: [],
-    tags: [],
   };
 
   const [values, handleChange, resetForm] = useForm(initialValues);

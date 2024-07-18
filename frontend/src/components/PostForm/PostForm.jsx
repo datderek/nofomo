@@ -41,8 +41,6 @@ export default function PostForm() {
     }
   };
 
-  // TODO: something is broken with the onChange handler after the refactor
-
   return (
     <form onSubmit={handleSubmit}>
       {errors && errors.map((error, index) => <p key={index}>{error}</p>)}
@@ -53,25 +51,19 @@ export default function PostForm() {
         value={values.title}
         handleChange={handleChange}
       />
+
       <TextInput
         name="location"
         label="Location"
         value={values.location}
         handleChange={handleChange}
       />
+
       <TextInput
         name="body"
         label="Body"
         value={values.body}
         handleChange={handleChange}
-      />
-
-      <label htmlFor="media">Media</label>
-      <input
-        type="text"
-        name="media"
-        value={values.media}
-        onChange={handleChange}
       />
 
       <DateInput
@@ -80,19 +72,12 @@ export default function PostForm() {
         value={values.eventStart}
         handleChange={handleChange}
       />
+
       <DateInput
         name="eventEnd"
         label="End Time"
         value={values.eventEnd}
         handleChange={handleChange}
-      />
-
-      <label htmlFor="tags">Tags</label>
-      <input
-        type="text"
-        name="tags"
-        value={values.tags}
-        onChange={handleChange}
       />
 
       <button type="submit">Create</button>

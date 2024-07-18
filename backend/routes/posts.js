@@ -10,28 +10,24 @@ router.post('/', async (req, res, next) => {
     title,
     location = null,
     body = null,
-    media = null,
-    tags = null,
     eventStart = null,
     eventEnd = null,
   } = req.body;
 
   try {
     // Validates request body and sets empty strings (ommitted optional fields) to null
-    ({ title, location, body, media, tags, eventStart, eventEnd } =
+    ({ title, location, body, eventStart, eventEnd } =
       await postSchema.validateAsync(
-        { title, location, body, media, tags, eventStart, eventEnd },
+        { title, location, body, eventStart, eventEnd },
         { abortEarly: false }
       ));
 
     const sql =
-      'INSERT INTO `posts` (`title`, `location`, `body`, `media`, `tags`, `event_start`, `event_end`) VALUES (?, ?, ?, ?, ?, ?, ?)';
+      'INSERT INTO `posts` (`title`, `location`, `body`, `event_start`, `event_end`) VALUES (?, ?, ?, ?, ?)';
     const [result] = await db.execute(sql, [
       title,
       location,
       body,
-      media,
-      tags,
       eventStart,
       eventEnd,
     ]);

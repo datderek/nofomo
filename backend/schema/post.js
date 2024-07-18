@@ -11,18 +11,6 @@ const schema = Joi.object({
 
   location: Joi.string().empty('').default(null).allow(null),
 
-  media: Joi.array()
-    .items(Joi.string().uri())
-    .empty(Joi.array().length(0))
-    .default(null)
-    .allow(null),
-
-  tags: Joi.array()
-    .items(Joi.string())
-    .empty(Joi.array().length(0))
-    .default(null)
-    .allow(null),
-
   // Ensures timestamp is in the MySQL format
   eventStart: Joi.string()
     .empty('')

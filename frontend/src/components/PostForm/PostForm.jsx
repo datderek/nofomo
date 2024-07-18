@@ -1,15 +1,17 @@
 import useForm from '../../hooks/useForm.jsx';
 import { useState } from 'react';
+import TextInput from './TextInput.jsx';
+import DateInput from './DateInput.jsx';
 
 export default function PostForm() {
   const initialValues = {
     title: '',
     location: '',
     body: '',
-    media: [],
-    tags: [],
     eventStart: '',
     eventEnd: '',
+    media: [],
+    tags: [],
   };
 
   const [values, handleChange, resetForm] = useForm(initialValues);
@@ -27,43 +29,41 @@ export default function PostForm() {
         body: JSON.stringify(values),
       });
 
-      resetForm();
       if (response.ok) {
         // TODO: Redirect on success
+        resetForm();
       } else {
-        setErrors((await response.json()).error);
+        const errorData = await response.json();
+        setErrors(errorData.error);
       }
     } catch (err) {
-      setErrors(err.error);
+      setErrors([err.message]);
     }
   };
+
+  // TODO: something is broken with the onChange handler after the refactor
 
   return (
     <form onSubmit={handleSubmit}>
       {errors && errors.map((error, index) => <p key={index}>{error}</p>)}
 
-      <label htmlFor="title">Title</label>
-      <input
-        type="text"
+      <TextInput
         name="title"
+        label="Title"
         value={values.title}
-        onChange={handleChange}
+        handleChange={handleChange}
       />
-
-      <label htmlFor="location">Location</label>
-      <input
-        type="text"
+      <TextInput
         name="location"
+        label="Location"
         value={values.location}
-        onChange={handleChange}
+        handleChange={handleChange}
       />
-
-      <label htmlFor="body">Body</label>
-      <input
-        type="text"
+      <TextInput
         name="body"
+        label="Body"
         value={values.body}
-        onChange={handleChange}
+        handleChange={handleChange}
       />
 
       <label htmlFor="media">Media</label>
@@ -74,20 +74,17 @@ export default function PostForm() {
         onChange={handleChange}
       />
 
-      <label htmlFor="eventStart">Start Time</label>
-      <input
-        type="date"
+      <DateInput
         name="eventStart"
+        label="Start Time"
         value={values.eventStart}
-        onChange={handleChange}
+        handleChange={handleChange}
       />
-
-      <label htmlFor="eventEnd">End Time</label>
-      <input
-        type="date"
+      <DateInput
         name="eventEnd"
+        label="End Time"
         value={values.eventEnd}
-        onChange={handleChange}
+        handleChange={handleChange}
       />
 
       <label htmlFor="tags">Tags</label>

@@ -1,7 +1,7 @@
 export default function TextInput({ name, label, register, options, error }) {
   return (
     <>
-      <label htmlFor={name}>{label}</label>
+      {label && <label htmlFor={name}>{label}</label>}
       <input
         id={name}
         type="text"

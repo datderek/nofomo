@@ -1,10 +1,32 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
+import DatePicker from 'react-datepicker';
 import TextInput from './TextInput.jsx';
-import DateInput from './DateInput.jsx';
+import 'react-datepicker/dist/react-datepicker.css';
+
+const formatDate = (date) => {
+  if (typeof date === 'undefined') return date;
+
+  return date.toISOString().slice(0, 19).replace('T', ' ');
+};
+
+const hasStart = (watch) => (val) => {
+  if (val !== '' && typeof watch('eventStart') === 'undefined') {
+    return 'Please provide a start time when selecting an end time';
+  }
+};
+
+const greaterThanStart = (watch) => (val) => {
+  const startDate = watch('eventStart');
+  const endDate = val;
+  if (endDate < startDate) {
+    return 'End time must be after start time';
+  }
+};
 
 export default function PostForm() {
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -14,6 +36,9 @@ export default function PostForm() {
   const [serverErrors, setServerErrors] = useState([]);
 
   const submitHandler = async (data) => {
+    data.eventStart = formatDate(data.eventStart);
+    data.eventEnd = formatDate(data.eventEnd);
+
     try {
       const response = await fetch('http://localhost:4000/api/posts', {
         method: 'POST',
@@ -78,30 +103,45 @@ export default function PostForm() {
         }}
         error={errors.body}
       />
-      <DateInput name="eventStart" label="Start Time" register={register} />
-      <DateInput
+      <Controller
+        name="eventStart"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <DatePicker
+            placeholderText="Select date"
+            showTimeSelect
+            timeIntervals={15}
+            timeFormat="HH:mm"
+            dateFormat="MMMM d, yyyy h:mm aa"
+            onChange={onChange}
+            selected={value}
+            enableTabLoop={false}
+          />
+        )}
+      />
+      <Controller
         name="eventEnd"
-        label="End Time"
-        register={register}
-        options={{
+        control={control}
+        rules={{
           validate: {
-            hasStart: (val) => {
-              if (val !== '' && watch('eventStart') === '') {
-                return 'Please provide a start time when selecting an end time';
-              }
-            },
-            greaterThanStart: (val) => {
-              const startDate = new Date(watch('eventStart'));
-              const endDate = new Date(val);
-              if (endDate < startDate) {
-                return 'End time must be after start time';
-              }
-            },
+            hasStart: hasStart(watch),
+            greaterThanStart: greaterThanStart(watch),
           },
         }}
-        error={errors.eventEnd}
+        render={({ field: { onChange, value } }) => (
+          <DatePicker
+            placeholderText="Select date"
+            showTimeSelect
+            timeIntervals={15}
+            timeFormat="HH:mm"
+            dateFormat="MMMM d, yyyy h:mm aa"
+            onChange={onChange}
+            selected={value}
+            enableTabLoop={false}
+          />
+        )}
       />
-
+      {errors.eventEnd && <span>{errors.eventEnd.message}</span>}
       <button type="submit">Create</button>
     </form>
   );

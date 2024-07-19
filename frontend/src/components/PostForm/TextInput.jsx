@@ -1,4 +1,4 @@
-export default function TextInput({ name, label, register, options, error }) {
+export default function TextInput({ name, label, register, options, invalid }) {
   return (
     <>
       {label && <label htmlFor={name}>{label}</label>}
@@ -6,9 +6,8 @@ export default function TextInput({ name, label, register, options, error }) {
         id={name}
         type="text"
         {...register(name, options)}
-        aria-invalid={error ? true : false}
+        aria-invalid={invalid}
       />
-      {error && <span>{error.message}</span>}
     </>
   );
 }

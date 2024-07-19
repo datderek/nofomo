@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { hasStart, greaterThanStart } from './validations.js';
 import { formatDate } from '../../utils/utils.js';
-import DatePicker from 'react-datepicker';
 import TextInput from './TextInput.jsx';
-import 'react-datepicker/dist/react-datepicker.css';
+import DateTimeInput from './DateTimeInput.jsx';
+import ErrorMessage from './ErrorMessage.jsx';
 
 export default function PostForm() {
   const {
@@ -49,7 +49,6 @@ export default function PostForm() {
     <form onSubmit={handleSubmit(submitHandler)}>
       {serverErrors &&
         serverErrors.map((error) => <span key={error}>{error}</span>)}
-
       <TextInput
         name="title"
         label="Title"
@@ -59,8 +58,9 @@ export default function PostForm() {
           minLength: 1,
           maxLength: 120,
         }}
-        error={errors.title}
+        invalid={errors.title ? true : false}
       />
+      <ErrorMessage error={errors.title} />
       <TextInput
         name="location"
         label="Location"
@@ -71,8 +71,9 @@ export default function PostForm() {
             message: 'Address exceeds the maximum length',
           },
         }}
-        error={errors.location}
+        invalid={errors.location ? true : false}
       />
+      <ErrorMessage error={errors.location} />
       <TextInput
         name="body"
         label="Body"
@@ -83,26 +84,13 @@ export default function PostForm() {
             message: 'Body exceeds the maximum length',
           },
         }}
-        error={errors.body}
+        invalid={errors.body ? true : false}
       />
-      <Controller
-        name="eventStart"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <DatePicker
-            placeholderText="Select date"
-            showTimeSelect
-            timeIntervals={15}
-            timeFormat="HH:mm"
-            dateFormat="MMMM d, yyyy h:mm aa"
-            onChange={onChange}
-            selected={value}
-            enableTabLoop={false}
-          />
-        )}
-      />
-      <Controller
+      <ErrorMessage error={errors.body} />
+      <DateTimeInput name="eventStart" label="From" control={control} />
+      <DateTimeInput
         name="eventEnd"
+        label="To"
         control={control}
         rules={{
           validate: {
@@ -110,20 +98,8 @@ export default function PostForm() {
             greaterThanStart: greaterThanStart(watch),
           },
         }}
-        render={({ field: { onChange, value } }) => (
-          <DatePicker
-            placeholderText="Select date"
-            showTimeSelect
-            timeIntervals={15}
-            timeFormat="HH:mm"
-            dateFormat="MMMM d, yyyy h:mm aa"
-            onChange={onChange}
-            selected={value}
-            enableTabLoop={false}
-          />
-        )}
       />
-      {errors.eventEnd && <span>{errors.eventEnd.message}</span>}
+      <ErrorMessage error={errors.eventEnd} />
       <button type="submit">Create</button>
     </form>
   );

@@ -1,5 +1,8 @@
 export const hasStart = (watch) => (val) => {
-  if (val !== '' && typeof watch('eventStart') === 'undefined') {
+  if (
+    typeof val !== 'undefined' &&
+    typeof watch('eventStart') === 'undefined'
+  ) {
     return 'Please provide a start time when selecting an end time';
   }
 };
@@ -7,7 +10,7 @@ export const hasStart = (watch) => (val) => {
 export const greaterThanStart = (watch) => (val) => {
   const startDate = watch('eventStart');
   const endDate = val;
-  if (endDate < startDate) {
+  if (endDate <= startDate) {
     return 'End time must be after start time';
   }
 };

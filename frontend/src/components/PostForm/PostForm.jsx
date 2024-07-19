@@ -1,81 +1,105 @@
-import useForm from '../../hooks/useForm.jsx';
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import TextInput from './TextInput.jsx';
 import DateInput from './DateInput.jsx';
 
 export default function PostForm() {
-  const initialValues = {
-    title: '',
-    location: '',
-    body: '',
-    eventStart: '',
-    eventEnd: '',
-  };
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors },
+  } = useForm();
+  const [serverErrors, setServerErrors] = useState([]);
 
-  const [values, handleChange, resetForm] = useForm(initialValues);
-  const [errors, setErrors] = useState([]);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const submitHandler = async (data) => {
     try {
       const response = await fetch('http://localhost:4000/api/posts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(values),
+        body: JSON.stringify(data),
       });
 
       if (response.ok) {
         // TODO: Redirect on success
-        resetForm();
+        reset();
       } else {
-        const errorData = await response.json();
-        setErrors(errorData.error);
+        const body = await response.json();
+        setServerErrors(body.error);
       }
     } catch (err) {
-      setErrors([err.message]);
+      setServerErrors([
+        'Sorry something went wrong. An error has occured on the server.',
+      ]);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      {errors && errors.map((error, index) => <p key={index}>{error}</p>)}
+    // react-hook-form handleSubmit() validates inputs prior to calling submitHandler
+    <form onSubmit={handleSubmit(submitHandler)}>
+      {serverErrors &&
+        serverErrors.map((error) => <span key={error}>{error}</span>)}
 
       <TextInput
         name="title"
         label="Title"
-        value={values.title}
-        handleChange={handleChange}
+        register={register}
+        options={{
+          required: 'Please provide a title for your post',
+          minLength: 1,
+          maxLength: 120,
+        }}
+        error={errors.title}
       />
-
       <TextInput
         name="location"
         label="Location"
-        value={values.location}
-        handleChange={handleChange}
+        register={register}
+        options={{
+          maxLength: {
+            value: 100,
+            message: 'Address exceeds the maximum length',
+          },
+        }}
+        error={errors.location}
       />
-
       <TextInput
         name="body"
         label="Body"
-        value={values.body}
-        handleChange={handleChange}
+        register={register}
+        options={{
+          maxLength: {
+            value: 1500,
+            message: 'Body exceeds the maximum length',
+          },
+        }}
+        error={errors.body}
       />
-
-      <DateInput
-        name="eventStart"
-        label="Start Time"
-        value={values.eventStart}
-        handleChange={handleChange}
-      />
-
+      <DateInput name="eventStart" label="Start Time" register={register} />
       <DateInput
         name="eventEnd"
         label="End Time"
-        value={values.eventEnd}
-        handleChange={handleChange}
+        register={register}
+        options={{
+          validate: {
+            hasStart: (val) => {
+              if (val !== '' && watch('eventStart') === '') {
+                return 'Please provide a start time when selecting an end time';
+              }
+            },
+            greaterThanStart: (val) => {
+              const startDate = new Date(watch('eventStart'));
+              const endDate = new Date(val);
+              if (endDate < startDate) {
+                return 'End time must be after start time';
+              }
+            },
+          },
+        }}
+        error={errors.eventEnd}
       />
 
       <button type="submit">Create</button>

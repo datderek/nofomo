@@ -1,28 +1,10 @@
 import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
+import { hasStart, greaterThanStart } from './validations.js';
+import { formatDate } from '../../utils/utils.js';
 import DatePicker from 'react-datepicker';
 import TextInput from './TextInput.jsx';
 import 'react-datepicker/dist/react-datepicker.css';
-
-const formatDate = (date) => {
-  if (typeof date === 'undefined') return date;
-
-  return date.toISOString().slice(0, 19).replace('T', ' ');
-};
-
-const hasStart = (watch) => (val) => {
-  if (val !== '' && typeof watch('eventStart') === 'undefined') {
-    return 'Please provide a start time when selecting an end time';
-  }
-};
-
-const greaterThanStart = (watch) => (val) => {
-  const startDate = watch('eventStart');
-  const endDate = val;
-  if (endDate < startDate) {
-    return 'End time must be after start time';
-  }
-};
 
 export default function PostForm() {
   const {

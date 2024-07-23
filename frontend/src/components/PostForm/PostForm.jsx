@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { hasStart, greaterThanStart } from './validations.js';
 import { formatDate } from '../../utils/utils.js';
-import TextInput from './TextInput.jsx';
 import DateTimeInput from './DateTimeInput.jsx';
+import TextInput from './TextInput.jsx';
+import TextAreaInput from './TextAreaInput.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
 
 export default function PostForm() {
@@ -82,7 +83,7 @@ export default function PostForm() {
         isDirty={dirtyFields.location}
       />
       <ErrorMessage error={errors.location} />
-      <TextInput
+      <TextAreaInput
         name="body"
         label="Body"
         register={register}

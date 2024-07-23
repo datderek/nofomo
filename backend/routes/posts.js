@@ -42,6 +42,34 @@ router.post('/', async (req, res, next) => {
   }
 });
 
+// Get a post by id
+router.get('/:postId', async (req, res, next) => {
+  const { postId } = req.params;
+
+  try {
+    const sql = 'SELECT * FROM `posts` WHERE `id` = ?';
+    const [result] = await db.execute(sql, [postId]);
+
+    if (result.length === 1) {
+      res.status(200).send({
+        status: 'success',
+        data: {
+          post: result[0],
+        },
+      });
+    } else {
+      res.status(404).send({
+        status: 'fail',
+        data: {
+          message: `No post found with the id: ${postId}`,
+        },
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Error handling middleware
 router.use((err, req, res, next) => {
   if (err.isJoi) {

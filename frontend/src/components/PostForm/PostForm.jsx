@@ -13,8 +13,14 @@ export default function PostForm() {
     handleSubmit,
     reset,
     watch,
-    formState: { errors },
-  } = useForm();
+    formState: { errors, dirtyFields },
+  } = useForm({
+    defaultValues: {
+      title: '',
+      location: '',
+      body: '',
+    },
+  });
   const [serverErrors, setServerErrors] = useState([]);
 
   const submitHandler = async (data) => {
@@ -46,7 +52,7 @@ export default function PostForm() {
 
   return (
     // react-hook-form handleSubmit() validates inputs prior to calling submitHandler
-    <form onSubmit={handleSubmit(submitHandler)}>
+    <form onSubmit={handleSubmit(submitHandler)} className="flex flex-col">
       {serverErrors &&
         serverErrors.map((error) => <span key={error}>{error}</span>)}
       <TextInput
@@ -59,6 +65,7 @@ export default function PostForm() {
           maxLength: 120,
         }}
         invalid={errors.title ? true : false}
+        isDirty={dirtyFields.title}
       />
       <ErrorMessage error={errors.title} />
       <TextInput
@@ -72,6 +79,7 @@ export default function PostForm() {
           },
         }}
         invalid={errors.location ? true : false}
+        isDirty={dirtyFields.location}
       />
       <ErrorMessage error={errors.location} />
       <TextInput
@@ -85,22 +93,28 @@ export default function PostForm() {
           },
         }}
         invalid={errors.body ? true : false}
+        isDirty={dirtyFields.body}
       />
       <ErrorMessage error={errors.body} />
-      <DateTimeInput name="eventStart" label="From" control={control} />
-      <DateTimeInput
-        name="eventEnd"
-        label="To"
-        control={control}
-        rules={{
-          validate: {
-            hasStart: hasStart(watch),
-            greaterThanStart: greaterThanStart(watch),
-          },
-        }}
-      />
+
+      <div className={'flex justify-center my-2'}>
+        <DateTimeInput name="eventStart" label="From" control={control} />
+        <DateTimeInput
+          name="eventEnd"
+          label="To"
+          control={control}
+          rules={{
+            validate: {
+              hasStart: hasStart(watch),
+              greaterThanStart: greaterThanStart(watch),
+            },
+          }}
+        />
+      </div>
       <ErrorMessage error={errors.eventEnd} />
-      <button type="submit">Create</button>
+      <button type="submit" className={'rounded border border-gray-400 my-2'}>
+        Create
+      </button>
     </form>
   );
 }

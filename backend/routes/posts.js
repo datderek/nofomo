@@ -1,8 +1,7 @@
 const express = require('express');
 const db = require('../config/database');
 const postSchema = require('../schema/post');
-const { getUpdateFields } = require('../utils/utils');
-
+const { getUpdateFields, formatValidationErrors } = require('../utils/utils');
 const router = express.Router();
 
 // Create a new post
@@ -34,9 +33,12 @@ router.post('/', async (req, res, next) => {
     ]);
 
     res.status(201).send({
-      message: 'Post created successfully',
-      title,
-      postId: result.insertId,
+      status: 'success',
+      data: {
+        message: 'Post created successfully',
+        title,
+        postId: result.insertId,
+      },
     });
   } catch (err) {
     next(err);
@@ -137,10 +139,18 @@ router.delete('/:postId', async (req, res, next) => {
 router.use((err, req, res, next) => {
   if (err.isJoi) {
     // Joi validation error
-    res.status(422).send({ error: err.details.map((e) => e.message) });
+    res.status(422).send({
+      status: 'fail',
+      data: {
+        errors: formatValidationErrors(err.details),
+      },
+    });
   } else {
     // Generic or database error
-    res.status(500).send({ error: 'Internal Server Error' });
+    res.status(500).send({
+      status: 'error',
+      message: 'Internal server error - unable to communicate with database',
+    });
   }
 });
 

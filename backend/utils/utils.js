@@ -23,4 +23,13 @@ const getUpdateFields = (body) => {
   return { updateFields, values };
 };
 
-module.exports = { getUpdateFields };
+const formatValidationErrors = (errors) => {
+  const formatedErrors = errors.reduce((acc, error) => {
+    acc[error.path[0]] = error.message;
+    return acc;
+  }, {});
+
+  return formatedErrors;
+};
+
+module.exports = { getUpdateFields, formatValidationErrors };

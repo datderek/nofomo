@@ -42,7 +42,7 @@ export default function PostForm() {
         reset();
       } else {
         const body = await response.json();
-        setServerErrors(body.error);
+        setServerErrors(Object.values(body.data.errors));
       }
     } catch (err) {
       setServerErrors([
@@ -55,7 +55,11 @@ export default function PostForm() {
     // react-hook-form handleSubmit() validates inputs prior to calling submitHandler
     <form onSubmit={handleSubmit(submitHandler)} className="flex flex-col">
       {serverErrors &&
-        serverErrors.map((error) => <span key={error}>{error}</span>)}
+        serverErrors.map((error) => (
+          <span className={'text-red-400'} key={error}>
+            {error}
+          </span>
+        ))}
       <TextInput
         name="title"
         label="Title"

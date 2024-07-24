@@ -70,6 +70,71 @@ router.get('/:postId', async (req, res, next) => {
   }
 });
 
+// Update a post by id
+router.patch('/:postId', async (req, res, next) => {
+  const { postId } = req.params;
+
+  // Check if the request body is empty
+  if (Object.keys(req.body).length === 0) {
+    res.status(400).send({
+      status: 'fail',
+      data: {
+        message: 'Request body cannot be empty',
+      },
+    });
+    return;
+  }
+
+  let { title, location, body, eventStart, eventEnd } = req.body;
+
+  const fields = [];
+  const values = [];
+
+  if (title) {
+    fields.push('title = ?');
+    values.push(title);
+  }
+  if (location) {
+    fields.push('location = ?');
+    values.push(location);
+  }
+  if (body) {
+    fields.push('body = ?');
+    values.push(body);
+  }
+  if (eventStart) {
+    fields.push('event_start = ?');
+    values.push(eventStart);
+  }
+  if (eventEnd) {
+    fields.push('event_end = ?');
+    values.push(eventEnd);
+  }
+
+  values.push(postId);
+
+  try {
+    const sql = `UPDATE posts SET ${fields.join(', ')} WHERE id = ?`;
+    const [result] = await db.execute(sql, values);
+
+    if (result.affectedRows === 1) {
+      res.status(200).send({
+        status: 'success',
+        data: null,
+      });
+    } else {
+      res.status(404).send({
+        status: 'fail',
+        data: {
+          message: `No post found with the id: ${postId}`,
+        },
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+});
+
 // Error handling middleware
 router.use((err, req, res, next) => {
   if (err.isJoi) {

@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../config/database');
 const postSchema = require('../schema/post');
+const { getUpdateFields } = require('../utils/utils');
 
 const router = express.Router();
 
@@ -73,49 +74,21 @@ router.get('/:postId', async (req, res, next) => {
 // Update a post by id
 router.patch('/:postId', async (req, res, next) => {
   const { postId } = req.params;
+  const { updateFields, values } = getUpdateFields(req.body);
 
-  // Check if the request body is empty
-  if (Object.keys(req.body).length === 0) {
-    res.status(400).send({
+  if (updateFields.length === 0) {
+    return res.status(400).send({
       status: 'fail',
       data: {
         message: 'Request body cannot be empty',
       },
     });
-    return;
   }
-
-  let { title, location, body, eventStart, eventEnd } = req.body;
-
-  const fields = [];
-  const values = [];
-
-  if (title) {
-    fields.push('title = ?');
-    values.push(title);
-  }
-  if (location) {
-    fields.push('location = ?');
-    values.push(location);
-  }
-  if (body) {
-    fields.push('body = ?');
-    values.push(body);
-  }
-  if (eventStart) {
-    fields.push('event_start = ?');
-    values.push(eventStart);
-  }
-  if (eventEnd) {
-    fields.push('event_end = ?');
-    values.push(eventEnd);
-  }
-
-  values.push(postId);
 
   try {
-    const sql = `UPDATE posts SET ${fields.join(', ')} WHERE id = ?`;
-    const [result] = await db.execute(sql, values);
+    const sql = `UPDATE posts SET ${updateFields.join(', ')} WHERE id = ?`;
+    console.log(sql);
+    const [result] = await db.execute(sql, [...values, postId]);
 
     if (result.affectedRows === 1) {
       res.status(200).send({
@@ -131,6 +104,7 @@ router.patch('/:postId', async (req, res, next) => {
       });
     }
   } catch (err) {
+    console.log(err);
     next(err);
   }
 });

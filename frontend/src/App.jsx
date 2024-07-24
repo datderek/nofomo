@@ -1,10 +1,20 @@
-import PostForm from './components/PostForm/PostForm';
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+} from '@clerk/clerk-react';
 
 function App() {
   return (
     <>
       <h1>nofomo</h1>
-      <PostForm />
+      <SignedOut>
+        <SignInButton />
+      </SignedOut>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
     </>
   );
 }

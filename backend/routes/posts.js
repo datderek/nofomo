@@ -87,7 +87,6 @@ router.patch('/:postId', async (req, res, next) => {
 
   try {
     const sql = `UPDATE posts SET ${updateFields.join(', ')} WHERE id = ?`;
-    console.log(sql);
     const [result] = await db.execute(sql, [...values, postId]);
 
     if (result.affectedRows === 1) {
@@ -104,7 +103,6 @@ router.patch('/:postId', async (req, res, next) => {
       });
     }
   } catch (err) {
-    console.log(err);
     next(err);
   }
 });

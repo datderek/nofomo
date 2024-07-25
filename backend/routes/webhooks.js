@@ -65,6 +65,17 @@ router.post('/', async (req, res, next) => {
       }
       break;
     }
+    case 'user.deleted': {
+      const { id: clerkId } = event.data;
+
+      try {
+        const sql = 'DELETE FROM `users` WHERE `clerk_id` = ?';
+        await db.execute(sql, [clerkId]);
+      } catch (err) {
+        next(err);
+      }
+      break;
+    }
     default: {
       throw new Error('No handler defined for event of type: ' + event.type);
     }

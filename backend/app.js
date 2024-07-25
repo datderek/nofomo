@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const webhooksRouter = require('./routes/webhooks');
 const postRouter = require('./routes/posts');
 
 const app = express();
@@ -19,6 +20,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 
 // --- Routes --- //
+app.use('/api/webhooks', webhooksRouter);
 app.use('/api/posts', postRouter);
 
 app.listen(port, () => {

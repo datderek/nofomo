@@ -65,6 +65,25 @@ router.post('/', async (req, res, next) => {
       }
       break;
     }
+    case 'user.updated': {
+      const {
+        id: clerkId,
+        username,
+        email_addresses: emailAddresses,
+        first_name: firstName,
+        last_name: lastName,
+      } = event.data;
+      const { email_address: email } = emailAddresses[0];
+
+      try {
+        const sql =
+          'UPDATE `users` SET `username` = ?, `email` = ?, `first_name` = ?, `last_name` = ? WHERE `clerk_id` = ?';
+        await db.execute(sql, [username, email, firstName, lastName, clerkId]);
+      } catch (err) {
+        next(err);
+      }
+      break;
+    }
     case 'user.deleted': {
       const { id: clerkId } = event.data;
 

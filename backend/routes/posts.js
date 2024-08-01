@@ -1,10 +1,13 @@
 const express = require('express');
 const db = require('../config/database');
+const { S3Client } = require('@aws-sdk/client-s3');
 const postSchema = require('../schema/post');
 const { getUpdateFields, formatValidationErrors } = require('../utils/utils');
 const { ClerkExpressRequireAuth } = require('@clerk/clerk-sdk-node');
 
 const router = express.Router();
+const s3 = new S3Client({});
+console.log(s3);
 
 // Create a new post belonging to the concurrent user
 router.post('/', ClerkExpressRequireAuth(), async (req, res, next) => {

@@ -2,10 +2,12 @@ const express = require('express');
 const db = require('../config/database');
 const postSchema = require('../schema/post');
 const { getUpdateFields, formatValidationErrors } = require('../utils/utils');
+const { ClerkExpressRequireAuth } = require('@clerk/clerk-sdk-node');
+
 const router = express.Router();
 
-// Create a new post
-router.post('/', async (req, res, next) => {
+// Create a new post belonging to the concurrent user
+router.post('/', ClerkExpressRequireAuth(), async (req, res, next) => {
   let {
     title,
     location = null,
@@ -13,6 +15,7 @@ router.post('/', async (req, res, next) => {
     eventStart = null,
     eventEnd = null,
   } = req.body;
+  const { userId: clerkId } = req.auth;
 
   try {
     // Validates request body and sets empty strings (ommitted optional fields) to null
@@ -22,8 +25,12 @@ router.post('/', async (req, res, next) => {
         { abortEarly: false }
       ));
 
-    const sql =
-      'INSERT INTO `posts` (`title`, `location`, `body`, `event_start`, `event_end`) VALUES (?, ?, ?, ?, ?)';
+    // Creates a user variable of the internal user id for subsequent database calls
+    let sql = `SET @user_id = (SELECT id FROM users WHERE clerk_id = ?)`;
+    await db.execute(sql, [clerkId]);
+
+    sql =
+      'INSERT INTO `posts` (`user_id`, `title`, `location`, `body`, `event_start`, `event_end`) VALUES (@user_id, ?, ?, ?, ?, ?)';
     const [result] = await db.execute(sql, [
       title,
       location,
@@ -137,12 +144,20 @@ router.delete('/:postId', async (req, res, next) => {
 
 // Error handling middleware
 router.use((err, req, res, next) => {
+  console.log(err);
   if (err.isJoi) {
     // Joi validation error
     res.status(422).send({
       status: 'fail',
       data: {
         errors: formatValidationErrors(err.details),
+      },
+    });
+  } else if (err.message === 'Unauthenticated') {
+    res.status(401).json({
+      status: 'error',
+      data: {
+        message: 'Unauthorized',
       },
     });
   } else {

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useAuth } from '@clerk/clerk-react';
 import { hasStart, greaterThanStart } from './validations.js';
 import { formatDate } from '../../utils/utils.js';
 import DateTimeInput from './DateTimeInput.jsx';
+import FileInput from './FileInput.jsx';
 import TextInput from './TextInput.jsx';
 import TextAreaInput from './TextAreaInput.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
@@ -22,19 +24,33 @@ export default function PostForm() {
       body: '',
     },
   });
+  const { getToken } = useAuth();
+
+  // Errors returned from the server after a failed post creation attempt
   const [serverErrors, setServerErrors] = useState([]);
 
+  // Formats and submits the form data
   const submitHandler = async (data) => {
     data.eventStart = formatDate(data.eventStart);
     data.eventEnd = formatDate(data.eventEnd);
+    const formData = new FormData();
+
+    // Loop over data and appends to formData (better for file uploads)
+    for (const [input, value] of Object.entries(data)) {
+      if (input === 'image' && value.length > 0) {
+        formData.append(input, value[0]);
+      } else {
+        formData.append(input, value);
+      }
+    }
 
     try {
       const response = await fetch('http://localhost:4000/api/posts', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${await getToken()}`,
         },
-        body: JSON.stringify(data),
+        body: formData,
       });
 
       if (response.ok) {
@@ -60,6 +76,18 @@ export default function PostForm() {
             {error}
           </span>
         ))}
+
+      <FileInput
+        name="image"
+        label="Please select an image"
+        register={register}
+        options={{
+          required: 'Please provide an image for your post',
+        }}
+        invalid={errors.image ? true : false}
+      />
+      <ErrorMessage error={errors.image} />
+
       <TextInput
         name="title"
         label="Title"

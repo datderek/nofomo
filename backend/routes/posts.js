@@ -1,14 +1,18 @@
 const express = require('express');
 const db = require('../config/database');
-const { S3Client } = require('@aws-sdk/client-s3');
+const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { ClerkExpressRequireAuth } = require('@clerk/clerk-sdk-node');
 const multer = require('multer');
 const postSchema = require('../schema/post');
-const { getUpdateFields, formatValidationErrors } = require('../utils/utils');
+const {
+  getUpdateFields,
+  formatValidationErrors,
+  generateUniqueFileName,
+} = require('../utils/utils');
 
 const router = express.Router();
 const s3 = new S3Client({});
-const upload = multer({ dest: 'dist/uploads/' });
+const upload = multer({ storage: multer.memoryStorage() });
 
 // Create a new post belonging to the concurrent user
 router.post(
@@ -23,14 +27,10 @@ router.post(
       eventStart = null,
       eventEnd = null,
     } = req.body;
-    const { image } = req.file;
+    const { originalname, buffer } = req.file;
     const { userId: clerkId } = req.auth;
 
     try {
-      //TODO:  Upload the user images to S3
-      console.log(s3);
-      console.log(image);
-
       // Validates request body and sets empty strings (ommitted optional fields) to null
       ({ title, location, body, eventStart, eventEnd } =
         await postSchema.validateAsync(
@@ -38,13 +38,23 @@ router.post(
           { abortEarly: false }
         ));
 
-      // Creates a user variable of the internal user id for subsequent database calls
-      let sql = `SET @user_id = (SELECT id FROM users WHERE clerk_id = ?)`;
-      await db.execute(sql, [clerkId]);
+      // Retrieves the internal userId from the clerkId
+      let sql = `SELECT id FROM users WHERE clerk_id = ?`;
+      const [result1] = await db.execute(sql, [clerkId]);
+      const userId = result1[0].id;
+
+      // Uploads the image to S3
+      const input = {
+        Bucket: 'nofomo-user-uploaded-content',
+        Key: generateUniqueFileName(userId, originalname),
+        Body: buffer,
+      };
+      await s3.send(new PutObjectCommand(input));
 
       sql =
-        'INSERT INTO `posts` (`user_id`, `title`, `location`, `body`, `event_start`, `event_end`) VALUES (@user_id, ?, ?, ?, ?, ?)';
-      const [result] = await db.execute(sql, [
+        'INSERT INTO `posts` (`user_id`, `title`, `location`, `body`, `event_start`, `event_end`) VALUES (?, ?, ?, ?, ?, ?)';
+      const [result2] = await db.execute(sql, [
+        userId,
         title,
         location,
         body,
@@ -57,7 +67,7 @@ router.post(
         data: {
           message: 'Post created successfully',
           title,
-          postId: result.insertId,
+          postId: result2.insertId,
         },
       });
     } catch (err) {

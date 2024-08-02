@@ -1,6 +1,7 @@
+// Creates the SQL statement for PATCH requests to /post depending on which fields are present
 // Returns:
-// updatedFields - an array of the fields to be updated to be inserted into the SQL statement
-// values - the ipdated values associated with those fields
+//   updateFields - an array of strings to be inserted in the SQL statement
+//   values - an array of updated values
 const getUpdateFields = (body) => {
   const fields = [
     { name: 'title', field: 'title = ?' },
@@ -32,4 +33,13 @@ const formatValidationErrors = (errors) => {
   return formatedErrors;
 };
 
-module.exports = { getUpdateFields, formatValidationErrors };
+// Creates a unique timestamped filename for user uploads to S3
+const generateUniqueFileName = (userId, fileName) => {
+  return `users/${userId}/${Date.now()}-${fileName}`;
+};
+
+module.exports = {
+  getUpdateFields,
+  formatValidationErrors,
+  generateUniqueFileName,
+};

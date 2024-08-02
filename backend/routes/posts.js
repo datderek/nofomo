@@ -1,9 +1,9 @@
 const express = require('express');
 const db = require('../config/database');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
-const { ClerkExpressRequireAuth } = require('@clerk/clerk-sdk-node');
-const multer = require('multer');
-const postSchema = require('../schema/post');
+const { requireAuth } = require('../middlewares/auth');
+const { upload } = require('../middlewares/upload');
+const { validatePost } = require('../middlewares/validation');
 const {
   getUpdateFields,
   formatValidationErrors,
@@ -12,32 +12,19 @@ const {
 
 const router = express.Router();
 const s3 = new S3Client({});
-const upload = multer({ storage: multer.memoryStorage() });
 
 // Create a new post belonging to the concurrent user
 router.post(
   '/',
-  ClerkExpressRequireAuth(),
+  requireAuth,
   upload.single('image'),
+  validatePost,
   async (req, res, next) => {
-    let {
-      title,
-      location = null,
-      body = null,
-      eventStart = null,
-      eventEnd = null,
-    } = req.body;
-    const { originalname, buffer } = req.file;
     const { userId: clerkId } = req.auth;
+    const { originalname, buffer } = req.file;
+    const { title, location, body, eventStart, eventEnd } = req.body;
 
     try {
-      // Validates request body and sets empty strings (ommitted optional fields) to null
-      ({ title, location, body, eventStart, eventEnd } =
-        await postSchema.validateAsync(
-          { title, location, body, eventStart, eventEnd },
-          { abortEarly: false }
-        ));
-
       // Retrieves the internal userId from the clerkId
       let sql = `SELECT id FROM users WHERE clerk_id = ?`;
       const [result1] = await db.execute(sql, [clerkId]);
@@ -168,7 +155,6 @@ router.delete('/:postId', async (req, res, next) => {
 
 // Error handling middleware
 router.use((err, req, res, next) => {
-  console.log(err);
   if (err.isJoi) {
     // Joi validation error
     res.status(422).send({
@@ -177,7 +163,8 @@ router.use((err, req, res, next) => {
         errors: formatValidationErrors(err.details),
       },
     });
-  } else if (err.message === 'Unauthenticated') {
+  } else if (err.isAuth) {
+    // Clerk authentication Error
     res.status(401).json({
       status: 'error',
       data: {

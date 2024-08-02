@@ -1,59 +1,70 @@
 const express = require('express');
 const db = require('../config/database');
 const { S3Client } = require('@aws-sdk/client-s3');
+const { ClerkExpressRequireAuth } = require('@clerk/clerk-sdk-node');
+const multer = require('multer');
 const postSchema = require('../schema/post');
 const { getUpdateFields, formatValidationErrors } = require('../utils/utils');
-const { ClerkExpressRequireAuth } = require('@clerk/clerk-sdk-node');
 
 const router = express.Router();
 const s3 = new S3Client({});
-console.log(s3);
+const upload = multer({ dest: 'dist/uploads/' });
 
 // Create a new post belonging to the concurrent user
-router.post('/', ClerkExpressRequireAuth(), async (req, res, next) => {
-  let {
-    title,
-    location = null,
-    body = null,
-    eventStart = null,
-    eventEnd = null,
-  } = req.body;
-  const { userId: clerkId } = req.auth;
-
-  try {
-    // Validates request body and sets empty strings (ommitted optional fields) to null
-    ({ title, location, body, eventStart, eventEnd } =
-      await postSchema.validateAsync(
-        { title, location, body, eventStart, eventEnd },
-        { abortEarly: false }
-      ));
-
-    // Creates a user variable of the internal user id for subsequent database calls
-    let sql = `SET @user_id = (SELECT id FROM users WHERE clerk_id = ?)`;
-    await db.execute(sql, [clerkId]);
-
-    sql =
-      'INSERT INTO `posts` (`user_id`, `title`, `location`, `body`, `event_start`, `event_end`) VALUES (@user_id, ?, ?, ?, ?, ?)';
-    const [result] = await db.execute(sql, [
+router.post(
+  '/',
+  ClerkExpressRequireAuth(),
+  upload.single('image'),
+  async (req, res, next) => {
+    let {
       title,
-      location,
-      body,
-      eventStart,
-      eventEnd,
-    ]);
+      location = null,
+      body = null,
+      eventStart = null,
+      eventEnd = null,
+    } = req.body;
+    const { image } = req.file;
+    const { userId: clerkId } = req.auth;
 
-    res.status(201).send({
-      status: 'success',
-      data: {
-        message: 'Post created successfully',
+    try {
+      //TODO:  Upload the user images to S3
+      console.log(s3);
+      console.log(image);
+
+      // Validates request body and sets empty strings (ommitted optional fields) to null
+      ({ title, location, body, eventStart, eventEnd } =
+        await postSchema.validateAsync(
+          { title, location, body, eventStart, eventEnd },
+          { abortEarly: false }
+        ));
+
+      // Creates a user variable of the internal user id for subsequent database calls
+      let sql = `SET @user_id = (SELECT id FROM users WHERE clerk_id = ?)`;
+      await db.execute(sql, [clerkId]);
+
+      sql =
+        'INSERT INTO `posts` (`user_id`, `title`, `location`, `body`, `event_start`, `event_end`) VALUES (@user_id, ?, ?, ?, ?, ?)';
+      const [result] = await db.execute(sql, [
         title,
-        postId: result.insertId,
-      },
-    });
-  } catch (err) {
-    next(err);
+        location,
+        body,
+        eventStart,
+        eventEnd,
+      ]);
+
+      res.status(201).send({
+        status: 'success',
+        data: {
+          message: 'Post created successfully',
+          title,
+          postId: result.insertId,
+        },
+      });
+    } catch (err) {
+      next(err);
+    }
   }
-});
+);
 
 // Get a post by id
 router.get('/:postId', async (req, res, next) => {

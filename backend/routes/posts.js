@@ -1,67 +1,15 @@
 const express = require('express');
 const db = require('../config/database');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { requireAuth } = require('../middlewares/auth');
 const { upload } = require('../middlewares/upload');
 const { validatePost } = require('../middlewares/validation');
-const {
-  getUpdateFields,
-  formatValidationErrors,
-  generateUniqueFileName,
-} = require('../utils/utils');
+const { getUpdateFields, formatValidationErrors } = require('../utils/utils');
+const { createPost } = require('../controllers/postController');
 
 const router = express.Router();
-const s3 = new S3Client({});
 
 // Create a new post belonging to the concurrent user
-router.post(
-  '/',
-  requireAuth,
-  upload.single('image'),
-  validatePost,
-  async (req, res, next) => {
-    const { userId: clerkId } = req.auth;
-    const { originalname, buffer } = req.file;
-    const { title, location, body, eventStart, eventEnd } = req.body;
-
-    try {
-      // Retrieves the internal userId from the clerkId
-      let sql = `SELECT id FROM users WHERE clerk_id = ?`;
-      const [result1] = await db.execute(sql, [clerkId]);
-      const userId = result1[0].id;
-
-      // Uploads the image to S3
-      const input = {
-        Bucket: 'nofomo-user-uploaded-content',
-        Key: generateUniqueFileName(userId, originalname),
-        Body: buffer,
-      };
-      await s3.send(new PutObjectCommand(input));
-
-      sql =
-        'INSERT INTO `posts` (`user_id`, `title`, `location`, `body`, `event_start`, `event_end`) VALUES (?, ?, ?, ?, ?, ?)';
-      const [result2] = await db.execute(sql, [
-        userId,
-        title,
-        location,
-        body,
-        eventStart,
-        eventEnd,
-      ]);
-
-      res.status(201).send({
-        status: 'success',
-        data: {
-          message: 'Post created successfully',
-          title,
-          postId: result2.insertId,
-        },
-      });
-    } catch (err) {
-      next(err);
-    }
-  }
-);
+router.post('/', requireAuth, upload.single('image'), validatePost, createPost);
 
 // Get a post by id
 router.get('/:postId', async (req, res, next) => {

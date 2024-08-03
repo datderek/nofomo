@@ -2,6 +2,7 @@ const db = require('../config/database');
 
 class Posts {
   // Creates a post on behalf of the authenticated user
+  //   Returns the id of the newly created post
   static async createPost(
     userId,
     imageUrl,
@@ -22,7 +23,21 @@ class Posts {
       eventStart,
       eventEnd,
     ]);
+
     return result.insertId;
+  }
+
+  // Retrieves the post associated with the id
+  //   Returns an object with all the columns of the post
+  static async getPostById(postId) {
+    const sql = 'SELECT * FROM `posts` WHERE `id` = ?';
+    const [result] = await db.execute(sql, [postId]);
+
+    if (result.length !== 1) {
+      throw new Error('Post not found');
+    }
+
+    return result[0];
   }
 }
 

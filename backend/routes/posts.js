@@ -4,7 +4,7 @@ const { requireAuth } = require('../middlewares/auth');
 const { upload } = require('../middlewares/upload');
 const { validatePost } = require('../middlewares/validation');
 const { getUpdateFields, formatValidationErrors } = require('../utils/utils');
-const { createPost } = require('../controllers/postController');
+const { createPost, getPost } = require('../controllers/postController');
 
 const router = express.Router();
 
@@ -12,32 +12,8 @@ const router = express.Router();
 router.post('/', requireAuth, upload.single('image'), validatePost, createPost);
 
 // Get a post by id
-router.get('/:postId', async (req, res, next) => {
-  const { postId } = req.params;
-
-  try {
-    const sql = 'SELECT * FROM `posts` WHERE `id` = ?';
-    const [result] = await db.execute(sql, [postId]);
-
-    if (result.length === 1) {
-      res.status(200).send({
-        status: 'success',
-        data: {
-          post: result[0],
-        },
-      });
-    } else {
-      res.status(404).send({
-        status: 'fail',
-        data: {
-          message: `No post found with the id: ${postId}`,
-        },
-      });
-    }
-  } catch (err) {
-    next(err);
-  }
-});
+// TODO: Add authorization
+router.get('/:postId', getPost);
 
 // Update a post by id
 router.patch('/:postId', async (req, res, next) => {

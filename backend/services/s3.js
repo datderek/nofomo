@@ -1,13 +1,19 @@
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
+const {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} = require('@aws-sdk/client-s3');
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { generateUniqueFileName } = require('../utils/utils');
 
+const bucket = 'nofomo-user-uploaded-content';
 const s3 = new S3Client({});
 
-async function uploadToS3(userId, originalname, buffer) {
+const uploadToS3 = async (userId, originalname, buffer) => {
   try {
     const key = generateUniqueFileName(userId, originalname);
     const input = {
-      Bucket: 'nofomo-user-uploaded-content',
+      Bucket: bucket,
       Key: key,
       Body: buffer,
     };
@@ -18,6 +24,16 @@ async function uploadToS3(userId, originalname, buffer) {
     console.error('Error uploading file to S3:', err);
     throw err;
   }
-}
+};
 
-module.exports = { uploadToS3 };
+const getPresignedUrl = async (imageUrl) => {
+  const input = {
+    Bucket: bucket,
+    Key: imageUrl,
+  };
+
+  const command = new GetObjectCommand(input);
+  return await getSignedUrl(s3, command, { expiresIn: 900 });
+};
+
+module.exports = { uploadToS3, getPresignedUrl };

@@ -3,7 +3,6 @@ const db = require('../config/database');
 const { requireAuth } = require('../middlewares/auth');
 const { upload } = require('../middlewares/upload');
 const { validatePost } = require('../middlewares/validation');
-const { errorHandler } = require('../middlewares/errors');
 const { getUpdateFields } = require('../utils/utils');
 const { createPost, getPost } = require('../controllers/postController');
 
@@ -13,7 +12,7 @@ const router = express.Router();
 router.post('/', requireAuth, upload.single('image'), validatePost, createPost);
 
 // Get a post by id
-router.get('/:postId', requireAuth, getPost);
+router.get('/:postId', getPost);
 
 // Update a post by id
 router.patch('/:postId', async (req, res, next) => {
@@ -76,7 +75,5 @@ router.delete('/:postId', async (req, res, next) => {
     next(err);
   }
 });
-
-router.use(errorHandler);
 
 module.exports = router;

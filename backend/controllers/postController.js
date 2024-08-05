@@ -31,7 +31,6 @@ const createPost = async (req, res, next) => {
       },
     });
   } catch (err) {
-    // TODO: implement error handling that forwards errors thrown by models
     next(err);
   }
 };
@@ -55,15 +54,6 @@ const getPost = async (req, res, next) => {
       },
     });
   } catch (err) {
-    // TODO: implement error handling that forwards errors thrown by models
-    // ^ Easy one to test is GET with bad id
-
-    // res.status(404).send({
-    //   status: 'fail',
-    //   data: {
-    //     message: `No post found with the id: ${postId}`,
-    //   },
-    // });
     next(err);
   }
 };

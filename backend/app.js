@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const webhooksRouter = require('./routes/webhooks');
 const postRouter = require('./routes/posts');
+const { errorHandler } = require('./middlewares/errors');
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -22,6 +23,8 @@ app.use(express.json());
 // --- Routes --- //
 app.use('/api/webhooks', webhooksRouter);
 app.use('/api/posts', postRouter);
+
+app.use(errorHandler);
 
 app.listen(port, () => {
   console.log(`Listening on port ${port}!`);

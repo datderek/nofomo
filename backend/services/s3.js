@@ -5,6 +5,7 @@ const {
 } = require('@aws-sdk/client-s3');
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { generateUniqueFileName } = require('../utils/utils');
+const { S3Error } = require('../utils/errors');
 
 const bucket = 'nofomo-user-uploaded-content';
 const s3 = new S3Client({});
@@ -21,8 +22,7 @@ const uploadToS3 = async (userId, originalname, buffer) => {
     await s3.send(new PutObjectCommand(input));
     return key;
   } catch (err) {
-    console.error('Error uploading file to S3:', err);
-    throw err;
+    throw new S3Error('Error uploading file to S3');
   }
 };
 
@@ -33,7 +33,11 @@ const getPresignedUrl = async (imageUrl) => {
   };
 
   const command = new GetObjectCommand(input);
-  return await getSignedUrl(s3, command, { expiresIn: 900 });
+  try {
+    return await getSignedUrl(s3, command, { expiresIn: 900 });
+  } catch (err) {
+    throw new S3Error('Error retrieving image from S3');
+  }
 };
 
 module.exports = { uploadToS3, getPresignedUrl };

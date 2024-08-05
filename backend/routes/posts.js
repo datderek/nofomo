@@ -3,7 +3,8 @@ const db = require('../config/database');
 const { requireAuth } = require('../middlewares/auth');
 const { upload } = require('../middlewares/upload');
 const { validatePost } = require('../middlewares/validation');
-const { getUpdateFields, formatValidationErrors } = require('../utils/utils');
+const { errorHandler } = require('../middlewares/errors');
+const { getUpdateFields } = require('../utils/utils');
 const { createPost, getPost } = require('../controllers/postController');
 
 const router = express.Router();
@@ -12,8 +13,7 @@ const router = express.Router();
 router.post('/', requireAuth, upload.single('image'), validatePost, createPost);
 
 // Get a post by id
-// TODO: Add authorization
-router.get('/:postId', getPost);
+router.get('/:postId', requireAuth, getPost);
 
 // Update a post by id
 router.patch('/:postId', async (req, res, next) => {
@@ -77,31 +77,6 @@ router.delete('/:postId', async (req, res, next) => {
   }
 });
 
-// Error handling middleware
-router.use((err, req, res, next) => {
-  if (err.isJoi) {
-    // Joi validation error
-    res.status(422).send({
-      status: 'fail',
-      data: {
-        errors: formatValidationErrors(err.details),
-      },
-    });
-  } else if (err.isAuth) {
-    // Clerk authentication Error
-    res.status(401).json({
-      status: 'error',
-      data: {
-        message: 'Unauthorized',
-      },
-    });
-  } else {
-    // Generic or database error
-    res.status(500).send({
-      status: 'error',
-      message: 'Internal server error - unable to communicate with database',
-    });
-  }
-});
+router.use(errorHandler);
 
 module.exports = router;

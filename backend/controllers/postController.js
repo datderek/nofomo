@@ -1,7 +1,9 @@
 const Users = require('../models/Users');
 const Posts = require('../models/Posts');
 const { uploadToS3, getPresignedUrl } = require('../services/s3');
-const { camelizeKeys } = require('../utils/utils');
+const { camelizeKeys, getUpdateFields } = require('../utils/utils');
+// TODO: Remove when Posts model implement update and create
+const db = require('../config/database');
 
 const createPost = async (req, res, next) => {
   const { userId: clerkId } = req.auth;
@@ -58,4 +60,64 @@ const getPost = async (req, res, next) => {
   }
 };
 
-module.exports = { createPost, getPost };
+const updatePost = async (req, res, next) => {
+  const { postId } = req.params;
+  const { updateFields, values } = getUpdateFields(req.body);
+
+  if (updateFields.length === 0) {
+    return res.status(400).send({
+      status: 'fail',
+      data: {
+        message: 'Request body cannot be empty',
+      },
+    });
+  }
+
+  try {
+    const sql = `UPDATE posts SET ${updateFields.join(', ')} WHERE id = ?`;
+    const [result] = await db.execute(sql, [...values, postId]);
+
+    if (result.affectedRows === 1) {
+      res.status(200).send({
+        status: 'success',
+        data: null,
+      });
+    } else {
+      res.status(404).send({
+        status: 'fail',
+        data: {
+          message: `No post found with the id: ${postId}`,
+        },
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deletePost = async (req, res, next) => {
+  const { postId } = req.params;
+
+  try {
+    const sql = 'DELETE FROM `posts` WHERE `id` = ?';
+    const [result] = await db.execute(sql, [postId]);
+
+    if (result.affectedRows === 1) {
+      res.status(200).send({
+        status: 'success',
+        data: null,
+      });
+    } else {
+      res.status(404).send({
+        status: 'fail',
+        data: {
+          message: `No post found with the id: ${postId}`,
+        },
+      });
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { createPost, getPost, updatePost, deletePost };

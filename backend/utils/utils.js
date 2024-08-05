@@ -1,6 +1,7 @@
+// Creates the SQL statement for PATCH requests to /post depending on which fields are present
 // Returns:
-// updatedFields - an array of the fields to be updated to be inserted into the SQL statement
-// values - the ipdated values associated with those fields
+//   updateFields - an array of strings to be inserted in the SQL statement
+//   values - an array of updated values
 const getUpdateFields = (body) => {
   const fields = [
     { name: 'title', field: 'title = ?' },
@@ -32,4 +33,24 @@ const formatValidationErrors = (errors) => {
   return formatedErrors;
 };
 
-module.exports = { getUpdateFields, formatValidationErrors };
+// Creates a unique timestamped filename for user uploads to S3
+const generateUniqueFileName = (userId, fileName) => {
+  return `users/${userId}/${Date.now()}-${fileName}`;
+};
+
+// Converts snake_case keys to camelCase (e.g. the Post object when it is retrieved from the database)
+const camelizeKeys = (obj) => {
+  return Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => [
+      key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase()),
+      value,
+    ])
+  );
+};
+
+module.exports = {
+  getUpdateFields,
+  formatValidationErrors,
+  generateUniqueFileName,
+  camelizeKeys,
+};

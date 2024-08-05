@@ -1,84 +1,19 @@
 const express = require('express');
 const db = require('../config/database');
-const postSchema = require('../schema/post');
-const { getUpdateFields, formatValidationErrors } = require('../utils/utils');
-const { ClerkExpressRequireAuth } = require('@clerk/clerk-sdk-node');
+const { requireAuth } = require('../middlewares/auth');
+const { upload } = require('../middlewares/upload');
+const { validatePost } = require('../middlewares/validation');
+const { errorHandler } = require('../middlewares/errors');
+const { getUpdateFields } = require('../utils/utils');
+const { createPost, getPost } = require('../controllers/postController');
 
 const router = express.Router();
 
 // Create a new post belonging to the concurrent user
-router.post('/', ClerkExpressRequireAuth(), async (req, res, next) => {
-  let {
-    title,
-    location = null,
-    body = null,
-    eventStart = null,
-    eventEnd = null,
-  } = req.body;
-  const { userId: clerkId } = req.auth;
-
-  try {
-    // Validates request body and sets empty strings (ommitted optional fields) to null
-    ({ title, location, body, eventStart, eventEnd } =
-      await postSchema.validateAsync(
-        { title, location, body, eventStart, eventEnd },
-        { abortEarly: false }
-      ));
-
-    // Creates a user variable of the internal user id for subsequent database calls
-    let sql = `SET @user_id = (SELECT id FROM users WHERE clerk_id = ?)`;
-    await db.execute(sql, [clerkId]);
-
-    sql =
-      'INSERT INTO `posts` (`user_id`, `title`, `location`, `body`, `event_start`, `event_end`) VALUES (@user_id, ?, ?, ?, ?, ?)';
-    const [result] = await db.execute(sql, [
-      title,
-      location,
-      body,
-      eventStart,
-      eventEnd,
-    ]);
-
-    res.status(201).send({
-      status: 'success',
-      data: {
-        message: 'Post created successfully',
-        title,
-        postId: result.insertId,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+router.post('/', requireAuth, upload.single('image'), validatePost, createPost);
 
 // Get a post by id
-router.get('/:postId', async (req, res, next) => {
-  const { postId } = req.params;
-
-  try {
-    const sql = 'SELECT * FROM `posts` WHERE `id` = ?';
-    const [result] = await db.execute(sql, [postId]);
-
-    if (result.length === 1) {
-      res.status(200).send({
-        status: 'success',
-        data: {
-          post: result[0],
-        },
-      });
-    } else {
-      res.status(404).send({
-        status: 'fail',
-        data: {
-          message: `No post found with the id: ${postId}`,
-        },
-      });
-    }
-  } catch (err) {
-    next(err);
-  }
-});
+router.get('/:postId', requireAuth, getPost);
 
 // Update a post by id
 router.patch('/:postId', async (req, res, next) => {
@@ -142,31 +77,6 @@ router.delete('/:postId', async (req, res, next) => {
   }
 });
 
-// Error handling middleware
-router.use((err, req, res, next) => {
-  console.log(err);
-  if (err.isJoi) {
-    // Joi validation error
-    res.status(422).send({
-      status: 'fail',
-      data: {
-        errors: formatValidationErrors(err.details),
-      },
-    });
-  } else if (err.message === 'Unauthenticated') {
-    res.status(401).json({
-      status: 'error',
-      data: {
-        message: 'Unauthorized',
-      },
-    });
-  } else {
-    // Generic or database error
-    res.status(500).send({
-      status: 'error',
-      message: 'Internal server error - unable to communicate with database',
-    });
-  }
-});
+router.use(errorHandler);
 
 module.exports = router;

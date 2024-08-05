@@ -11,11 +11,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.622.0",
+    "@aws-sdk/s3-request-presigner": "^3.623.0",
     "@clerk/clerk-sdk-node": "^5.0.18",
-    "aws-sdk": "^2.1666.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "joi": "^17.13.3",
+    "multer": "^1.4.5-lts.1",
     "mysql2": "^3.10.2",
     "svix": "^1.25.0"
   }

@@ -27,19 +27,13 @@ class Users {
   //   Throws an error if there no user associated with the id
   static async getUserIdByUsername(username) {
     const sql = 'SELECT `id` FROM `users` WHERE `username` = ?';
-    try {
-      const [result] = await db.execute(sql, [username]);
+    const [result] = await db.execute(sql, [username]);
 
-      if (result.length === 0) {
-        throw new NotFoundError(`No user found with username: ${username}`);
-      }
-
-      return result[0].id;
-    } catch (err) {
-      throw new DatabaseError(
-        'Failed database transaction: Unable to retrieve user id'
-      );
+    if (result.length === 0) {
+      throw new NotFoundError(`No user found with username: ${username}`);
     }
+
+    return result[0].id;
   }
 
   // Retrieves a user by id

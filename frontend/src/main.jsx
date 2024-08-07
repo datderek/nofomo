@@ -1,21 +1,35 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.jsx';
 import './index.css';
-import { ClerkProvider } from '@clerk/clerk-react';
+import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
-// Import Clerk publishable key - allows access to the Clerk Auth app
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+// Import the layouts
+import RootLayout from './layouts/RootLayout';
+import ProtectedLayout from './layouts/ProtectedLayout';
 
-// Prevents the application from starting without the publishable key
-if (!PUBLISHABLE_KEY) {
-  throw new Error('Missing Clerk Publishable Key');
-}
+// Import the components
+import HomePage from './routes/Home';
+import SignInPage from './routes/SignIn';
+import SignUpPage from './routes/SignUp';
+import DashboardPage from './routes/Dashboard';
+
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      { path: '/', element: <HomePage /> },
+      { path: '/sign-in/*', element: <SignInPage /> },
+      { path: '/sign-up/*', element: <SignUpPage /> },
+      {
+        element: <ProtectedLayout />,
+        children: [{ path: '/dashboard', element: <DashboardPage /> }],
+      },
+    ],
+  },
+]);
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} afterSignOutUrl="/">
-      <App />
-    </ClerkProvider>
+    <RouterProvider router={router} />
   </React.StrictMode>
 );

@@ -35,7 +35,7 @@ class Posts {
 
   // Retrieves the post associated with the id
   //   Returns an object with all the columns of the post
-  //   Throws an error if there no post associated with the id
+  //   Throws an error if there is no post associated with the id
   static async getPostById(postId) {
     const sql = 'SELECT * FROM `posts` WHERE `id` = ?';
     const [result] = await db.execute(sql, [postId]);
@@ -45,6 +45,16 @@ class Posts {
     }
 
     return result[0];
+  }
+
+  // Retrieve all posts created by a user
+  //   Returns an array of post objects (200)
+  //   Throws an error if the user does not exist
+  static async getPostsByUserId(userId) {
+    const sql = 'SELECT * FROM `posts` WHERE `user_id` = ?';
+    const [result] = await db.execute(sql, [userId]);
+
+    return result;
   }
 }
 

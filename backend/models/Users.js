@@ -22,6 +22,20 @@ class Users {
     }
   }
 
+  // Retrieves a user by id
+  //   Returns an object with all the columns of the user
+  //   Throws an error if there is no user associated with the id
+  static async getUserById(userId) {
+    const sql = 'SELECT * FROM `users` WHERE `id` = ?';
+    const [result] = await db.execute(sql, [userId]);
+
+    if (result.length !== 1) {
+      throw new NotFoundError(`No user found with id: ${userId}`);
+    }
+
+    return result[0];
+  }
+
   // Creates a new user
   //   Returns the id of the newly created user
   static async createUser(clerkId, username, email, firstName, lastName) {

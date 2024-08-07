@@ -1,4 +1,5 @@
 const db = require('../config/database');
+const Users = require('./Users');
 const { DatabaseError, NotFoundError } = require('../utils/errors');
 
 class Posts {
@@ -53,6 +54,11 @@ class Posts {
   static async getPostsByUserId(userId) {
     const sql = 'SELECT * FROM `posts` WHERE `user_id` = ?';
     const [result] = await db.execute(sql, [userId]);
+
+    // If zero posts returned, check and throw an error if user doesn't exists
+    if (result.length == 0) {
+      await Users.getUserById(userId);
+    }
 
     return result;
   }

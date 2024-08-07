@@ -3,10 +3,10 @@ const { getPresignedUrl } = require('../services/s3');
 const { camelizeKeys } = require('../utils/utils');
 
 const getUserPosts = async (req, res, next) => {
-  const { userId } = req.params;
+  const { username } = req.params;
 
   try {
-    let posts = await Posts.getPostsByUserId(userId);
+    let posts = await Posts.getPostsByUsername(username);
 
     // Presigns S3 object urls of posts (and converts the keys to camelCase)
     posts = await Promise.all(

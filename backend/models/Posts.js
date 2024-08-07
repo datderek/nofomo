@@ -48,7 +48,7 @@ class Posts {
     return result[0];
   }
 
-  // Retrieve all posts created by a user
+  // Retrieve all posts created by a user (by userId)
   //   Returns an array of post objects (200)
   //   Throws an error if the user does not exist
   static async getPostsByUserId(userId) {
@@ -59,6 +59,16 @@ class Posts {
     if (result.length == 0) {
       await Users.getUserById(userId);
     }
+
+    return result;
+  }
+
+  // Retrieve all posts created by a user (by username)
+  //   Returns an array of post objects (200)
+  //   Throws an error if the user does not exist
+  static async getPostsByUsername(username) {
+    const userId = await Users.getUserIdByUsername(username);
+    const result = await this.getPostsByUserId(userId);
 
     return result;
   }

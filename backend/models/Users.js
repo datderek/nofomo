@@ -5,7 +5,7 @@ class Users {
   // Retrieves the internal user id associated with the Clerk id
   //   Returns the user id
   //   Throws an error if there no user associated with the id
-  static async getUserByClerkId(clerkId) {
+  static async getUserIdByClerkId(clerkId) {
     const sql = `SELECT id FROM users WHERE clerk_id = ?`;
     try {
       const [result] = await db.execute(sql, [clerkId]);

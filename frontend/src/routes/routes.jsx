@@ -7,6 +7,7 @@ import HomePage from '../routes/Home';
 import SignInPage from '../routes/SignIn';
 import SignUpPage from '../routes/SignUp';
 import DashboardPage from '../routes/Dashboard';
+import ProfilePage from './Profile';
 
 const routes = [
   {
@@ -17,7 +18,10 @@ const routes = [
       { path: '/sign-up/*', element: <SignUpPage /> },
       {
         element: <ProtectedLayout />,
-        children: [{ path: '/dashboard', element: <DashboardPage /> }],
+        children: [
+          { path: '/dashboard', element: <DashboardPage /> },
+          { path: '/:username', element: <ProfilePage /> },
+        ],
       },
     ],
   },

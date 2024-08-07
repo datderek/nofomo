@@ -11,7 +11,7 @@ const createPost = async (req, res, next) => {
   const { title, location, body, eventStart, eventEnd } = req.body;
 
   try {
-    const userId = await Users.getUserByClerkId(clerkId);
+    const userId = await Users.getUserIdByClerkId(clerkId);
     // TODO: Consider sending presigned url to client to upload
     const imageUrl = await uploadToS3(userId, fileName, buffer);
     const insertId = await Posts.createPost(

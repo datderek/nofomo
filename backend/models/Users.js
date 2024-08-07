@@ -5,7 +5,7 @@ class Users {
   // Retrieves the internal user id associated with the Clerk id
   //   Returns the user id
   //   Throws an error if there no user associated with the id
-  static async getUserByClerkId(clerkId) {
+  static async getUserIdByClerkId(clerkId) {
     const sql = `SELECT id FROM users WHERE clerk_id = ?`;
     try {
       const [result] = await db.execute(sql, [clerkId]);
@@ -20,6 +20,20 @@ class Users {
         'Failed database transaction: Unable to retrieve user id'
       );
     }
+  }
+
+  // Retrieves a user by id
+  //   Returns an object with all the columns of the user
+  //   Throws an error if there is no user associated with the id
+  static async getUserById(userId) {
+    const sql = 'SELECT * FROM `users` WHERE `id` = ?';
+    const [result] = await db.execute(sql, [userId]);
+
+    if (result.length !== 1) {
+      throw new NotFoundError(`No user found with id: ${userId}`);
+    }
+
+    return result[0];
   }
 
   // Creates a new user

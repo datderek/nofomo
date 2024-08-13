@@ -4,9 +4,18 @@ const { camelizeKeys } = require('../utils/utils');
 
 const getUserPosts = async (req, res, next) => {
   const { username } = req.params;
+  const { page, limit } = req.query;
 
   try {
-    let posts = await Posts.getPostsByUsername(username);
+    let posts = [];
+
+    if (page && limit) {
+      // Get paginated posts
+      posts = await Posts.getPaginatedPostsByUsername(username, page, limit);
+    } else {
+      // Get all posts
+      posts = await Posts.getPostsByUsername(username);
+    }
 
     // Presigns S3 object urls of posts (and converts the keys to camelCase)
     posts = await Promise.all(

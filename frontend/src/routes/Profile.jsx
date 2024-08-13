@@ -7,19 +7,53 @@ export default function ProfilePage() {
   const params = useParams();
   const username = params.username;
   const [posts, setPosts] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
+  // Load more posts on paginate
   useEffect(() => {
-    fetch(`http://localhost:4000/api/users/${username}/posts`)
+    if (isLoading || !hasMore) return; // Skip fetching if already fetching or no more posts
+
+    setIsLoading(true);
+    const controller = new AbortController();
+
+    fetch(
+      `http://localhost:4000/api/users/${username}/posts?page=${page}&limit=9`,
+      { signal: controller.signal }
+    )
       .then((response) => response.json())
-      .then((body) => setPosts(body.data.posts));
-  }, []);
+      .then((body) => {
+        if (body.data.posts.length < 9) {
+          setHasMore(false);
+        }
+
+        setPosts((prevPosts) => [...prevPosts, ...body.data.posts]);
+        setIsLoading(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [page]);
+
+  const paginateHandler = () => {
+    // Increment page if more posts exists or not already currently fetching
+    if (hasMore && !isLoading) {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
 
   return (
     <>
       <div className="flex flex-row h-full">
         <div className="max-w-[800px] mx-auto bg-blue-100">
           <ProfileBanner />
-          <PostGrid posts={posts} />
+          <PostGrid
+            posts={posts}
+            handleLoadMore={paginateHandler}
+            hasMore={hasMore}
+          />
         </div>
       </div>
     </>

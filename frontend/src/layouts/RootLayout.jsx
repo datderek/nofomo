@@ -26,9 +26,9 @@ export default function RootLayout() {
           </SignedIn>
         </div>
       </header>
-      <main>
+      <div className="h-screen">
         <Outlet />
-      </main>
+      </div>
     </ClerkProvider>
   );
 }

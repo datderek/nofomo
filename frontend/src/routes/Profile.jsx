@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import ProfileBanner from '../components/ProfileBanner/ProfileBanner';
+import PostGrid from '../components/PostGrid/PostGrid';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -14,9 +16,13 @@ export default function ProfilePage() {
 
   return (
     <>
-      <h1>Profile Page</h1>
-      <p>You are visiting {params.username}</p>
-      <p>{JSON.stringify(posts)}</p>
+      <div className="flex flex-row h-full">
+        <div className="max-w-[800px] mx-auto bg-blue-100">
+          <div>{JSON.stringify(posts)}</div>
+          <ProfileBanner />
+          <PostGrid />
+        </div>
+      </div>
     </>
   );
 }

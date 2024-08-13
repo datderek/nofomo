@@ -11,16 +11,15 @@ export default function ProfilePage() {
   useEffect(() => {
     fetch(`http://localhost:4000/api/users/${username}/posts`)
       .then((response) => response.json())
-      .then((data) => setPosts(data));
+      .then((body) => setPosts(body.data.posts));
   }, []);
 
   return (
     <>
       <div className="flex flex-row h-full">
         <div className="max-w-[800px] mx-auto bg-blue-100">
-          <div>{JSON.stringify(posts)}</div>
           <ProfileBanner />
-          <PostGrid />
+          <PostGrid posts={posts} />
         </div>
       </div>
     </>

@@ -1,3 +1,11 @@
-export default function Post() {
-  return <div className="aspect-square bg-green-100"></div>;
+export default function Post({ src, title }) {
+  return (
+    <div className="aspect-square">
+      <img
+        src={src}
+        alt={title}
+        className="object-cover h-full w-full rounded-2xl"
+      />
+    </div>
+  );
 }

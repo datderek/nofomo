@@ -1,11 +1,10 @@
 import Post from './Post';
 
-export default function PostGrid() {
-  const posts = [1, 2, 3, 4, 5, 6];
+export default function PostGrid({ posts }) {
   return (
     <div className="w-full grid grid-cols-3 gap-2 bg-red-50">
-      {posts.map((post) => {
-        return <Post key={post}></Post>;
+      {posts?.map((post) => {
+        return <Post key={post} src={post.imageUrl} title={post.title}></Post>;
       })}
     </div>
   );

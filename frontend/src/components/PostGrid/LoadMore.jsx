@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
+import Spinner from './Spinner';
 
 export default function LoadMore({ handleLoadMore, hasMore }) {
   const { ref, inView } = useInView({
@@ -12,17 +13,12 @@ export default function LoadMore({ handleLoadMore, hasMore }) {
     }
   }, [inView]);
 
-  if (!hasMore) {
-    return (
-      <div className="h-[100px] bg-slate-400">
-        No additional posts to display.
-      </div>
-    );
-  }
-
   return (
-    <div ref={ref} className="h-[100px] bg-slate-400">
-      Loading more...
+    <div
+      ref={ref}
+      className="h-[100px] bg-blue-200 flex justify-center items-center"
+    >
+      {!hasMore ? <div>No additional posts to display.</div> : <Spinner />}
     </div>
   );
 }

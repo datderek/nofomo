@@ -8,10 +8,22 @@ export default function ProfilePage() {
   const username = params.username;
 
   const [currUser] = useOutletContext();
+  const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Retrieves user data
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(`http://localhost:4000/api/users/${username}`, {
+      signal: controller.signal,
+    })
+      .then((response) => response.json())
+      .then((body) => setUser(body.data.user));
+  }, []);
 
   // Load more posts on paginate
   useEffect(() => {
@@ -49,7 +61,7 @@ export default function ProfilePage() {
   return (
     <>
       <ProfileBanner
-        username={username}
+        user={user}
         belongsToCurrUser={currUser.username === username}
       />
       <PostGrid

@@ -7,7 +7,9 @@ const getUser = async (req, res, next) => {
   const { username } = req.params;
 
   try {
-    const user = await Users.getUserByUsername(username);
+    let user = await Users.getUserByUsername(username);
+
+    user = camelizeKeys(user);
 
     res.status(200).send({
       status: 'success',

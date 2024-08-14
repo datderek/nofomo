@@ -81,6 +81,7 @@ class Posts {
   // Retrieve all posts created by a user (by username)
   //   Returns an array of post objects (200)
   //   Throws an error if the user does not exist
+  // TODO: This could be more efficient via a join or subquery
   static async getPostsByUsername(username) {
     const userId = await Users.getUserIdByUsername(username);
     const result = await Posts.getPostsByUserId(userId);
@@ -91,6 +92,7 @@ class Posts {
   // Retrieve paginated posts created by a user (by username)
   //   Returns an aray of post objects (200)
   //   Throws an error if the user does not exist
+  // TODO: This could be more efficient via a join or subquery
   static async getPaginatedPostsByUsername(username, page, limit) {
     const userId = await Users.getUserIdByUsername(username);
     const result = await Posts.getPaginatedPostsByUserId(userId, page, limit);

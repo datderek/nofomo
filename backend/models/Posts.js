@@ -48,17 +48,52 @@ class Posts {
     return result[0];
   }
 
-  // Retrieve all posts created by a user
+  // Retrieve all posts created by a user (by userId)
   //   Returns an array of post objects (200)
   //   Throws an error if the user does not exist
   static async getPostsByUserId(userId) {
-    const sql = 'SELECT * FROM `posts` WHERE `user_id` = ?';
+    const sql =
+      'SELECT * FROM `posts` WHERE `user_id` = ? ORDER BY `created_at` DESC';
     const [result] = await db.execute(sql, [userId]);
 
     // If zero posts returned, check and throw an error if user doesn't exists
     if (result.length == 0) {
       await Users.getUserById(userId);
     }
+
+    return result;
+  }
+
+  static async getPaginatedPostsByUserId(userId, page, limit) {
+    const offset = ((page - 1) * limit).toString();
+    const sql =
+      'SELECT * FROM `posts` WHERE `user_id` = ? ORDER BY `created_at` DESC LIMIT ? OFFSET ?';
+    const [result] = await db.execute(sql, [userId, limit, offset]);
+
+    // If zero posts returned, check and throw an error if user doesn't exists
+    if (result.length == 0) {
+      await Users.getUserById(userId);
+    }
+
+    return result;
+  }
+
+  // Retrieve all posts created by a user (by username)
+  //   Returns an array of post objects (200)
+  //   Throws an error if the user does not exist
+  static async getPostsByUsername(username) {
+    const userId = await Users.getUserIdByUsername(username);
+    const result = await Posts.getPostsByUserId(userId);
+
+    return result;
+  }
+
+  // Retrieve paginated posts created by a user (by username)
+  //   Returns an aray of post objects (200)
+  //   Throws an error if the user does not exist
+  static async getPaginatedPostsByUsername(username, page, limit) {
+    const userId = await Users.getUserIdByUsername(username);
+    const result = await Posts.getPaginatedPostsByUserId(userId, page, limit);
 
     return result;
   }

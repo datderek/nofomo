@@ -52,16 +52,24 @@ class Users {
 
   // Creates a new user
   //   Returns the id of the newly created user
-  static async createUser(clerkId, username, email, firstName, lastName) {
+  static async createUser(
+    clerkId,
+    username,
+    email,
+    firstName,
+    lastName,
+    imageUrl
+  ) {
     try {
       const sql =
-        'INSERT INTO `users` (`clerk_id`, `username`, `email`, `first_name`, `last_name`) VALUES (?, ?, ?, ?, ?)';
+        'INSERT INTO `users` (`clerk_id`, `username`, `email`, `first_name`, `last_name`, `image_url`) VALUES (?, ?, ?, ?, ?, ?)';
       const [result] = await db.execute(sql, [
         clerkId,
         username,
         email,
         firstName,
         lastName,
+        imageUrl,
       ]);
       return result.insertId;
     } catch (err) {
@@ -72,11 +80,25 @@ class Users {
   }
 
   // Updates the user with the given clerk id
-  static async updateUser(clerkId, username, email, firstName, lastName) {
+  static async updateUser(
+    clerkId,
+    username,
+    email,
+    firstName,
+    lastName,
+    imageUrl
+  ) {
     try {
       const sql =
-        'UPDATE `users` SET `username` = ?, `email` = ?, `first_name` = ?, `last_name` = ? WHERE `clerk_id` = ?';
-      await db.execute(sql, [username, email, firstName, lastName, clerkId]);
+        'UPDATE `users` SET `username` = ?, `email` = ?, `first_name` = ?, `last_name` = ?, `image_url` = ? WHERE `clerk_id` = ?';
+      await db.execute(sql, [
+        username,
+        email,
+        firstName,
+        lastName,
+        imageUrl,
+        clerkId,
+      ]);
     } catch (err) {
       throw new DatabaseError(
         `Failed database transaction: Unable to update user with clerkId: ${clerkId}`

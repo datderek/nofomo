@@ -8,9 +8,17 @@ const createUser = async (event) => {
     email_addresses: emailAddresses,
     first_name: firstName,
     last_name: lastName,
+    image_url: imageUrl,
   } = event.data;
   const { email_address: email } = emailAddresses[0];
-  await Users.createUser(clerkId, username, email, firstName, lastName);
+  await Users.createUser(
+    clerkId,
+    username,
+    email,
+    firstName,
+    lastName,
+    imageUrl
+  );
 };
 
 const updateUser = async (event) => {
@@ -20,9 +28,17 @@ const updateUser = async (event) => {
     email_addresses: emailAddresses,
     first_name: firstName,
     last_name: lastName,
+    image_url: imageUrl,
   } = event.data;
   const { email_address: email } = emailAddresses[0];
-  await Users.updateUser(clerkId, username, email, firstName, lastName);
+  await Users.updateUser(
+    clerkId,
+    username,
+    email,
+    firstName,
+    lastName,
+    imageUrl
+  );
 };
 
 const deleteUser = async (event) => {

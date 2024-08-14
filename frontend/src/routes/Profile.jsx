@@ -46,16 +46,12 @@ export default function ProfilePage() {
 
   return (
     <>
-      <div className="flex flex-row h-full">
-        <div className="max-w-[800px] mx-auto bg-blue-100">
-          <ProfileBanner />
-          <PostGrid
-            posts={posts}
-            handleLoadMore={paginateHandler}
-            hasMore={hasMore}
-          />
-        </div>
-      </div>
+      <ProfileBanner />
+      <PostGrid
+        posts={posts}
+        handleLoadMore={paginateHandler}
+        hasMore={hasMore}
+      />
     </>
   );
 }

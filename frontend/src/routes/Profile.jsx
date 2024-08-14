@@ -58,6 +58,18 @@ export default function ProfilePage() {
     }
   };
 
+  // TODO:
+  // Handle when user does not exist, either redirect or display custom error or both
+  if (user === undefined) {
+    return (
+      <>
+        <div className="flex justify-center items-center">
+          User &apos;{username}&apos; not found.
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <ProfileBanner

@@ -1,14 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import ProfileBanner from '../components/ProfileBanner/ProfileBanner';
 import PostGrid from '../components/PostGrid/PostGrid';
 
 export default function ProfilePage() {
   const params = useParams();
   const username = params.username;
+
+  const [currUser] = useOutletContext();
   const [posts, setPosts] = useState([]);
-  const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   // Load more posts on paginate
@@ -46,7 +48,10 @@ export default function ProfilePage() {
 
   return (
     <>
-      <ProfileBanner />
+      <ProfileBanner
+        username={username}
+        belongsToCurrUser={currUser.username === username}
+      />
       <PostGrid
         posts={posts}
         handleLoadMore={paginateHandler}

@@ -50,6 +50,34 @@ class Users {
     return result[0];
   }
 
+  // Retrieves a user by username
+  //   Return an object with all the columns of the user
+  //   Throw an error if there is no user associated with the username
+  static async getUserByUsername(username) {
+    const sql = 'SELECT * FROM `users` WHERE `username` = ?';
+    const [result] = await db.execute(sql, [username]);
+
+    if (result.length !== 1) {
+      throw new NotFoundError(`No user found with username: ${username}`);
+    }
+
+    return result[0];
+  }
+
+  // Retrieves a user by clerk_id
+  //   Return an object with all the columns of the user
+  //   Throw an error if there is no user associated with the Clerk id
+  static async getUserByClerkId(clerkId) {
+    const sql = 'SELECT * FROM `users` WHERE sername`clerk_id` = ?';
+    const [result] = await db.execute(sql, [clerkId]);
+
+    if (result.length !== 1) {
+      throw new NotFoundError(`No user found with Clerk ID: ${clerkId}`);
+    }
+
+    return result[0];
+  }
+
   // Creates a new user
   //   Returns the id of the newly created user
   static async createUser(

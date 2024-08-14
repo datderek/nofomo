@@ -68,7 +68,7 @@ class Users {
   //   Return an object with all the columns of the user
   //   Throw an error if there is no user associated with the Clerk id
   static async getUserByClerkId(clerkId) {
-    const sql = 'SELECT * FROM `users` WHERE sername`clerk_id` = ?';
+    const sql = 'SELECT * FROM `users` WHERE `clerk_id` = ?';
     const [result] = await db.execute(sql, [clerkId]);
 
     if (result.length !== 1) {

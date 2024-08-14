@@ -1,6 +1,24 @@
 const Posts = require('../models/Posts');
+const Users = require('../models/Users');
 const { getPresignedUrl } = require('../services/s3');
 const { camelizeKeys } = require('../utils/utils');
+
+const getUser = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const user = await Users.getUserByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        user,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
 
 const getUserPosts = async (req, res, next) => {
   const { username } = req.params;
@@ -37,4 +55,4 @@ const getUserPosts = async (req, res, next) => {
   }
 };
 
-module.exports = { getUserPosts };
+module.exports = { getUser, getUserPosts };

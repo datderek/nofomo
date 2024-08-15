@@ -1,3 +1,4 @@
+const Followers = require('../models/Followers');
 const Posts = require('../models/Posts');
 const Users = require('../models/Users');
 const { getPresignedUrl } = require('../services/s3');
@@ -57,4 +58,29 @@ const getUserPosts = async (req, res, next) => {
   }
 };
 
-module.exports = { getUser, getUserPosts };
+const createFollow = async (req, res, next) => {
+  const { userId: clerkId } = req.auth;
+  const { username } = req.params;
+
+  try {
+    const followingUserId = await Users.getUserIdByClerkId(clerkId);
+    const followedUserId = await Users.getUserIdByUsername(username);
+
+    const insertId = await Followers.createFollow(
+      followingUserId,
+      followedUserId
+    );
+
+    res.status(201).send({
+      status: 'success',
+      data: {
+        message: `Successfully followed ${username}`,
+        followId: insertId,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = { getUser, getUserPosts, createFollow };

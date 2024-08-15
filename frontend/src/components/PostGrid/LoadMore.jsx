@@ -14,10 +14,7 @@ export default function LoadMore({ handleLoadMore, hasMore }) {
   }, [inView]);
 
   return (
-    <div
-      ref={ref}
-      className="h-[100px] bg-blue-200 flex justify-center items-center"
-    >
+    <div ref={ref} className="h-[100px] flex justify-center items-center">
       {!hasMore ? <div>No additional posts to display.</div> : <Spinner />}
     </div>
   );

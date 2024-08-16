@@ -1,6 +1,8 @@
+const Followers = require('../models/Followers');
 const Posts = require('../models/Posts');
 const Users = require('../models/Users');
 const { getPresignedUrl } = require('../services/s3');
+const { NotFoundError } = require('../utils/errors');
 const { camelizeKeys } = require('../utils/utils');
 
 const getUser = async (req, res, next) => {
@@ -57,4 +59,158 @@ const getUserPosts = async (req, res, next) => {
   }
 };
 
-module.exports = { getUser, getUserPosts };
+const getFollowStatus = async (req, res, next) => {
+  const { userId: clerkId } = req.auth;
+  const { username } = req.params;
+
+  try {
+    const followingUserId = await Users.getUserIdByClerkId(clerkId);
+    const followedUserId = await Users.getUserIdByUsername(username);
+
+    // Model will throw error if following relationship not found
+    await Followers.getFollowStatus(followingUserId, followedUserId);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        message: `${username} is followed by the current user.`,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getFollowers = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const followers = await Followers.getFollowersByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        followers,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getFollowerCount = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const followerCount = await Followers.getFollowerCountByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        followerCount,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getFollowing = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const following = await Followers.getFollowingByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        following,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getFollowingCount = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const followingCount =
+      await Followers.getFollowingCountByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        followingCount,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const createFollow = async (req, res, next) => {
+  const { userId: clerkId } = req.auth;
+  const { username } = req.params;
+
+  try {
+    const followingUserId = await Users.getUserIdByClerkId(clerkId);
+    const followedUserId = await Users.getUserIdByUsername(username);
+
+    const insertId = await Followers.createFollow(
+      followingUserId,
+      followedUserId
+    );
+
+    res.status(201).send({
+      status: 'success',
+      data: {
+        message: `Successfully followed ${username}`,
+        followId: insertId,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const deleteFollow = async (req, res, next) => {
+  const { userId: clerkId } = req.auth;
+  const { username } = req.params;
+
+  try {
+    const followingUserId = await Users.getUserIdByClerkId(clerkId);
+    const followedUserId = await Users.getUserIdByUsername(username);
+
+    const result = await Followers.deleteFollow(
+      followingUserId,
+      followedUserId
+    );
+
+    if (result.affectedRows >= 1) {
+      res.status(200).send({
+        status: 'success',
+        data: {
+          message: `Successfully unfollowed ${username}`,
+        },
+      });
+    } else {
+      throw new NotFoundError('No following relationship found.');
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  getUser,
+  getUserPosts,
+  getFollowStatus,
+  createFollow,
+  deleteFollow,
+  getFollowers,
+  getFollowerCount,
+  getFollowing,
+  getFollowingCount,
+};

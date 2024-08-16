@@ -1,5 +1,6 @@
 const db = require('../config/database');
 const { NotFoundError, DatabaseError } = require('../utils/errors');
+const Users = require('./Users');
 
 class Followers {
   // Checks if the current user is following the provided user
@@ -40,6 +41,53 @@ class Followers {
     const [result] = await db.execute(sql, [followingUserId, followedUserId]);
 
     return result;
+  }
+
+  // Get all of the followers of a user
+  //   Returns the list of followers
+  static async getFollowersByUsername(username) {
+    const followedUserId = await Users.getUserIdByUsername(username);
+    const sql =
+      'SELECT `users`.`username` FROM `followers` JOIN `users` ON `users`.`id` = `followers`.`following_user_id` WHERE `followed_user_id` = ?';
+    let [result] = await db.execute(sql, [followedUserId]);
+
+    result = result.map((item) => item.username);
+
+    return result;
+  }
+
+  // Get the follower count of a user
+  //   Returns the follower count
+  static async getFollowerCountByUsername(username) {
+    const followedUserId = await Users.getUserIdByUsername(username);
+    const sql = 'SELECT COUNT(*) FROM `followers` WHERE `followed_user_id` = ?';
+    let [result] = await db.execute(sql, [followedUserId]);
+
+    return result[0]['COUNT(*)'];
+  }
+
+  // Get all the users that a user is following
+  //   Returns the list of users following
+  static async getFollowingByUsername(username) {
+    const followingUserId = await Users.getUserIdByUsername(username);
+    const sql =
+      'SELECT `users`.`username` FROM `followers` JOIN `users` ON `users`.`id` = `followers`.`followed_user_id` WHERE `following_user_id` = ?';
+    let [result] = await db.execute(sql, [followingUserId]);
+
+    result = result.map((item) => item.username);
+
+    return result;
+  }
+
+  // Get the count of all users a user is following
+  //   Returns the following count
+  static async getFollowingCountByUsername(username) {
+    const followingUserId = await Users.getUserIdByUsername(username);
+    const sql =
+      'SELECT COUNT(*) FROM `followers` WHERE `following_user_id` = ?';
+    let [result] = await db.execute(sql, [followingUserId]);
+
+    return result[0]['COUNT(*)'];
   }
 }
 

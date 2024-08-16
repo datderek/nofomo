@@ -81,6 +81,75 @@ const getFollowStatus = async (req, res, next) => {
   }
 };
 
+const getFollowers = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const followers = await Followers.getFollowersByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        followers,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getFollowerCount = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const followerCount = await Followers.getFollowerCountByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        followerCount,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getFollowing = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const following = await Followers.getFollowingByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        following,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getFollowingCount = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const followingCount =
+      await Followers.getFollowingCountByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        followingCount,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const createFollow = async (req, res, next) => {
   const { userId: clerkId } = req.auth;
   const { username } = req.params;
@@ -133,10 +202,15 @@ const deleteFollow = async (req, res, next) => {
     next(err);
   }
 };
+
 module.exports = {
   getUser,
   getUserPosts,
   getFollowStatus,
   createFollow,
   deleteFollow,
+  getFollowers,
+  getFollowerCount,
+  getFollowing,
+  getFollowingCount,
 };

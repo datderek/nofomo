@@ -5,6 +5,10 @@ const {
   getFollowStatus,
   createFollow,
   deleteFollow,
+  getFollowers,
+  getFollowerCount,
+  getFollowing,
+  getFollowingCount,
 } = require('../controllers/userController');
 const { requireAuth } = require('../middlewares/auth');
 
@@ -17,7 +21,19 @@ router.get('/:username', getUser);
 router.get('/:username/posts', getUserPosts);
 
 // Check if user is followed by the current authenticated user
-router.get('/:username/following', requireAuth, getFollowStatus);
+router.get('/me/following/:username/', requireAuth, getFollowStatus);
+
+// Get the list of all users following a user
+router.get('/:username/followers', getFollowers);
+
+// Get the count of all users following a user
+router.get('/:username/followers/count', getFollowerCount);
+
+// // Get the list of all users followed by a user
+router.get('/:username/following', getFollowing);
+
+// Get the count of all users followed by a user
+router.get('/:username/following/count', getFollowingCount);
 
 // Follow another user (as the current authenticated user)
 router.post('/:username/follow', requireAuth, createFollow);

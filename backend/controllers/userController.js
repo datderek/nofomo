@@ -2,6 +2,7 @@ const Followers = require('../models/Followers');
 const Posts = require('../models/Posts');
 const Users = require('../models/Users');
 const { getPresignedUrl } = require('../services/s3');
+const { NotFoundError } = require('../utils/errors');
 const { camelizeKeys } = require('../utils/utils');
 
 const getUser = async (req, res, next) => {
@@ -105,4 +106,37 @@ const createFollow = async (req, res, next) => {
   }
 };
 
-module.exports = { getUser, getUserPosts, getFollowStatus, createFollow };
+const deleteFollow = async (req, res, next) => {
+  const { userId: clerkId } = req.auth;
+  const { username } = req.params;
+
+  try {
+    const followingUserId = await Users.getUserIdByClerkId(clerkId);
+    const followedUserId = await Users.getUserIdByUsername(username);
+
+    const result = await Followers.deleteFollow(
+      followingUserId,
+      followedUserId
+    );
+
+    if (result.affectedRows >= 1) {
+      res.status(200).send({
+        status: 'success',
+        data: {
+          message: `Successfully unfollowed ${username}`,
+        },
+      });
+    } else {
+      throw new NotFoundError('No following relationship found.');
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+module.exports = {
+  getUser,
+  getUserPosts,
+  getFollowStatus,
+  createFollow,
+  deleteFollow,
+};

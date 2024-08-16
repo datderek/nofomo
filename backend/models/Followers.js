@@ -32,6 +32,15 @@ class Followers {
       );
     }
   }
+
+  // Deletes the following relationship between the two provided user
+  static async deleteFollow(followingUserId, followedUserId) {
+    const sql =
+      'DELETE FROM `followers` WHERE `following_user_id` = ? AND `followed_user_id` = ?';
+    const [result] = await db.execute(sql, [followingUserId, followedUserId]);
+
+    return result;
+  }
 }
 
 module.exports = Followers;

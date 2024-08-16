@@ -4,6 +4,7 @@ const {
   getUserPosts,
   getFollowStatus,
   createFollow,
+  deleteFollow,
 } = require('../controllers/userController');
 const { requireAuth } = require('../middlewares/auth');
 
@@ -22,6 +23,6 @@ router.get('/:username/following', requireAuth, getFollowStatus);
 router.post('/:username/follow', requireAuth, createFollow);
 
 // Unfollow another user (as the concurrent authenticated user)
-// router.delete('/:username/unfollow', requireAuth, deleteFollow);
+router.delete('/:username/unfollow', requireAuth, deleteFollow);
 
 module.exports = router;

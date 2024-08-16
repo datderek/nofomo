@@ -58,6 +58,28 @@ const getUserPosts = async (req, res, next) => {
   }
 };
 
+const getFollowStatus = async (req, res, next) => {
+  const { userId: clerkId } = req.auth;
+  const { username } = req.params;
+
+  try {
+    const followingUserId = await Users.getUserIdByClerkId(clerkId);
+    const followedUserId = await Users.getUserIdByUsername(username);
+
+    // Model will throw error if following relationship not found
+    await Followers.getFollowStatus(followingUserId, followedUserId);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        message: `${username} is followed by the current user.`,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const createFollow = async (req, res, next) => {
   const { userId: clerkId } = req.auth;
   const { username } = req.params;
@@ -83,4 +105,4 @@ const createFollow = async (req, res, next) => {
   }
 };
 
-module.exports = { getUser, getUserPosts, createFollow };
+module.exports = { getUser, getUserPosts, getFollowStatus, createFollow };

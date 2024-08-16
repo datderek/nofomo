@@ -2,6 +2,7 @@ const express = require('express');
 const {
   getUser,
   getUserPosts,
+  getFollowStatus,
   createFollow,
 } = require('../controllers/userController');
 const { requireAuth } = require('../middlewares/auth');
@@ -13,6 +14,9 @@ router.get('/:username', getUser);
 
 // Get all posts belonging to a user (by username)
 router.get('/:username/posts', getUserPosts);
+
+// Check if user is followed by the current authenticated user
+router.get('/:username/following', requireAuth, getFollowStatus);
 
 // Follow another user (as the current authenticated user)
 router.post('/:username/follow', requireAuth, createFollow);

@@ -1,6 +1,7 @@
 const express = require('express');
 const {
   getUser,
+  getProfileData,
   getUserPosts,
   getUserPostCount,
   getFollowStatus,
@@ -17,6 +18,9 @@ const router = express.Router();
 
 // Get all user information (first name, last name, etc.) to a user
 router.get('/:username', getUser);
+
+// Gets all data required to display on profile page
+router.get('/:username/profile', getProfileData);
 
 // Get all posts belonging to a user
 router.get('/:username/posts', getUserPosts);

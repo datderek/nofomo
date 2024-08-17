@@ -2,6 +2,7 @@ const express = require('express');
 const {
   getUser,
   getUserPosts,
+  getUserPostCount,
   getFollowStatus,
   createFollow,
   deleteFollow,
@@ -14,11 +15,14 @@ const { requireAuth } = require('../middlewares/auth');
 
 const router = express.Router();
 
-// Get all user information to a user (by username)
+// Get all user information (first name, last name, etc.) to a user
 router.get('/:username', getUser);
 
-// Get all posts belonging to a user (by username)
+// Get all posts belonging to a user
 router.get('/:username/posts', getUserPosts);
+
+// Get the number of posts belonging to a user
+router.get('/:username/posts/count', getUserPostCount);
 
 // Check if user is followed by the current authenticated user
 router.get('/me/following/:username/', requireAuth, getFollowStatus);

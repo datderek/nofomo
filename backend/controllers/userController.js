@@ -59,6 +59,23 @@ const getUserPosts = async (req, res, next) => {
   }
 };
 
+const getUserPostCount = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const postCount = await Posts.getPostCountByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        postCount,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getFollowStatus = async (req, res, next) => {
   const { userId: clerkId } = req.auth;
   const { username } = req.params;
@@ -206,6 +223,7 @@ const deleteFollow = async (req, res, next) => {
 module.exports = {
   getUser,
   getUserPosts,
+  getUserPostCount,
   getFollowStatus,
   createFollow,
   deleteFollow,

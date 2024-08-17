@@ -18,47 +18,11 @@ export default function ProfilePage() {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch(`http://localhost:4000/api/users/${username}`, {
+    fetch(`http://localhost:4000/api/users/${username}/profile`, {
       signal: controller.signal,
     })
       .then((response) => response.json())
-      .then((body) =>
-        setProfileData((prevProfileData) => {
-          return { ...prevProfileData, ...body.data.user };
-        })
-      );
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
-
-  // Retrieves user social data (# of followers and followings)
-  useEffect(() => {
-    const controller = new AbortController();
-
-    fetch(`http://localhost:4000/api/users/${username}/followers/count`, {
-      signal: controller.signal,
-    })
-      .then((response) => response.json())
-      .then((body) =>
-        setProfileData((prevProfileData) => {
-          return { ...prevProfileData, followerCount: body.data.followerCount };
-        })
-      );
-
-    fetch(`http://localhost:4000/api/users/${username}/following/count`, {
-      signal: controller.signal,
-    })
-      .then((response) => response.json())
-      .then((body) =>
-        setProfileData((prevProfileData) => {
-          return {
-            ...prevProfileData,
-            followingCount: body.data.followingCount,
-          };
-        })
-      );
+      .then((body) => setProfileData(body.data.profileData));
 
     return () => {
       controller.abort();
@@ -67,7 +31,8 @@ export default function ProfilePage() {
 
   // Load more posts on paginate
   useEffect(() => {
-    if (isLoading || !hasMore) return; // Skip fetching if already fetching or no more posts
+    // Skip fetching if already fetching or no more posts
+    if (isLoading || !hasMore) return;
 
     setIsLoading(true);
     const controller = new AbortController();

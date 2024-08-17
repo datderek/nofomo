@@ -18,7 +18,7 @@ export default function ProfileBanner({ profileData, belongsToCurrUser }) {
       </div>
       <div className="text-lg leading-tight mb-2">@{profileData.username}</div>
       <div className="col-start-2 col-end-4 w-full flex gap-x-10 mb-2 ">
-        <div>XX posts</div>
+        <div>{profileData.postCount} posts</div>
         <div>{profileData.followerCount} followers</div>
         <div>{profileData.followingCount} following</div>
       </div>

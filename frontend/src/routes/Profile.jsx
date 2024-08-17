@@ -8,13 +8,13 @@ export default function ProfilePage() {
   const username = params.username;
 
   const [currUser] = useOutletContext();
-  const [user, setUser] = useState({});
+  const [profileData, setProfileData] = useState({});
   const [posts, setPosts] = useState([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Retrieves user data
+  // Retrieves user information
   useEffect(() => {
     const controller = new AbortController();
 
@@ -22,7 +22,47 @@ export default function ProfilePage() {
       signal: controller.signal,
     })
       .then((response) => response.json())
-      .then((body) => setUser(body.data.user));
+      .then((body) =>
+        setProfileData((prevProfileData) => {
+          return { ...prevProfileData, ...body.data.user };
+        })
+      );
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  // Retrieves user social data (# of followers and followings)
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch(`http://localhost:4000/api/users/${username}/followers/count`, {
+      signal: controller.signal,
+    })
+      .then((response) => response.json())
+      .then((body) =>
+        setProfileData((prevProfileData) => {
+          return { ...prevProfileData, followerCount: body.data.followerCount };
+        })
+      );
+
+    fetch(`http://localhost:4000/api/users/${username}/following/count`, {
+      signal: controller.signal,
+    })
+      .then((response) => response.json())
+      .then((body) =>
+        setProfileData((prevProfileData) => {
+          return {
+            ...prevProfileData,
+            followingCount: body.data.followingCount,
+          };
+        })
+      );
+
+    return () => {
+      controller.abort();
+    };
   }, []);
 
   // Load more posts on paginate
@@ -60,7 +100,7 @@ export default function ProfilePage() {
 
   // TODO:
   // Handle when user does not exist, either redirect or display custom error or both
-  if (user === undefined) {
+  if (profileData === undefined) {
     return (
       <>
         <div className="flex justify-center items-center">
@@ -73,7 +113,7 @@ export default function ProfilePage() {
   return (
     <>
       <ProfileBanner
-        user={user}
+        profileData={profileData}
         belongsToCurrUser={currUser.username === username}
       />
       <PostGrid

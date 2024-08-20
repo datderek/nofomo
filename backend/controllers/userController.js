@@ -24,6 +24,33 @@ const getUser = async (req, res, next) => {
   }
 };
 
+const getProfileData = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const user = await Users.getUserByUsername(username);
+    const postCount = await Posts.getPostCountByUsername(username);
+    const followerCount = await Followers.getFollowerCountByUsername(username);
+    const followingCount =
+      await Followers.getFollowingCountByUsername(username);
+    const profileData = {
+      ...camelizeKeys(user),
+      postCount,
+      followerCount,
+      followingCount,
+    };
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        profileData,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 const getUserPosts = async (req, res, next) => {
   const { username } = req.params;
   const { page, limit } = req.query;
@@ -52,6 +79,23 @@ const getUserPosts = async (req, res, next) => {
       status: 'success',
       data: {
         posts,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+const getUserPostCount = async (req, res, next) => {
+  const { username } = req.params;
+
+  try {
+    const postCount = await Posts.getPostCountByUsername(username);
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        postCount,
       },
     });
   } catch (err) {
@@ -205,7 +249,9 @@ const deleteFollow = async (req, res, next) => {
 
 module.exports = {
   getUser,
+  getProfileData,
   getUserPosts,
+  getUserPostCount,
   getFollowStatus,
   createFollow,
   deleteFollow,

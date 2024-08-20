@@ -89,6 +89,14 @@ class Posts {
     return result;
   }
 
+  static async getPostCountByUsername(username) {
+    const sql =
+      'SELECT COUNT(*) FROM `posts` JOIN `users` ON `users`.`id` = `posts`.`user_id` WHERE `username` = ?';
+    const [result] = await db.execute(sql, [username]);
+
+    return result[0]['COUNT(*)'];
+  }
+
   // Retrieve paginated posts created by a user (by username)
   //   Returns an aray of post objects (200)
   //   Throws an error if the user does not exist

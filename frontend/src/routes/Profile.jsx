@@ -1,5 +1,6 @@
 import useProfileData from '../hooks/useProfileData';
 import useUserPosts from '../hooks/useUserPosts';
+import useFollowStatus from '../hooks/useFollowStatus';
 import { useParams, useOutletContext } from 'react-router-dom';
 import ProfileBanner from '../components/ProfileBanner/ProfileBanner';
 import PostGrid from '../components/PostGrid/PostGrid';
@@ -8,8 +9,9 @@ export default function ProfilePage() {
   const params = useParams();
   const username = params.username;
 
-  const [currUser] = useOutletContext();
+  const [currUser, getToken] = useOutletContext();
   const { profileData } = useProfileData(username);
+  const { isFollowing } = useFollowStatus(username, getToken);
   const { posts, hasMorePosts, loadMorePosts } = useUserPosts(username);
 
   // TODO:
@@ -29,6 +31,7 @@ export default function ProfilePage() {
       <ProfileBanner
         profileData={profileData}
         belongsToCurrUser={currUser.username === username}
+        isFollowing={isFollowing}
       />
       <PostGrid
         posts={posts}

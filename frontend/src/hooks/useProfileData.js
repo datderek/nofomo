@@ -31,7 +31,6 @@ export default function useProfileData(username) {
         }
 
         setProfileData(body.data.profileData);
-        setIsLoading(false);
       } catch (err) {
         setError(err);
       }

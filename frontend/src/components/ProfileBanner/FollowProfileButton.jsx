@@ -1,16 +1,11 @@
 import Button from './Button';
 
-export default function FollowProfileButton({ isFollowing }) {
-  const handleClick = () => {
-    if (isFollowing) {
-      // Unfollow
-    } else {
-      // Follow
-    }
-  };
-
+export default function FollowProfileButton({
+  isFollowing,
+  toggleFollowStatus,
+}) {
   return (
-    <Button handleClick={handleClick}>
+    <Button handleClick={toggleFollowStatus}>
       {isFollowing ? 'Unfollow' : 'Follow'}
     </Button>
   );

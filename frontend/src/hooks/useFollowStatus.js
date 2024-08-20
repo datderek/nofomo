@@ -44,5 +44,28 @@ export default function useFollowStatus(username, getToken) {
     };
   }, [username]);
 
-  return { isFollowing, isLoading, error };
+  const toggleFollowStatus = async () => {
+    const response = await fetch(
+      `http://localhost:4000/api/users/${username}/${isFollowing ? 'unfollow' : 'follow'}`,
+      {
+        method: isFollowing ? 'DELETE' : 'POST',
+        headers: {
+          Authorization: `Bearer ${await getToken()}`,
+        },
+      }
+    );
+
+    const body = await response.json();
+
+    if (body.status === 'success') {
+      setIsFollowing((prevIsFollowing) => !prevIsFollowing);
+    } else if (body.status === 'fail') {
+      // TODO: Implement error handingling
+      alert('Failed');
+    } else {
+      alert('Server error');
+    }
+  };
+
+  return { isFollowing, toggleFollowStatus, isLoading, error };
 }

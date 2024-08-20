@@ -11,7 +11,10 @@ export default function ProfilePage() {
 
   const [currUser, getToken] = useOutletContext();
   const { profileData } = useProfileData(username);
-  const { isFollowing } = useFollowStatus(username, getToken);
+  const { isFollowing, toggleFollowStatus } = useFollowStatus(
+    username,
+    getToken
+  );
   const { posts, hasMorePosts, loadMorePosts } = useUserPosts(username);
 
   // TODO:
@@ -32,6 +35,7 @@ export default function ProfilePage() {
         profileData={profileData}
         belongsToCurrUser={currUser.username === username}
         isFollowing={isFollowing}
+        toggleFollowStatus={toggleFollowStatus}
       />
       <PostGrid
         posts={posts}

@@ -5,6 +5,7 @@ export default function ProfileBanner({
   profileData,
   belongsToCurrUser,
   isFollowing,
+  toggleFollowStatus,
 }) {
   return (
     <div className="w-full px-4 py-2 grid grid-cols-3 grid-rows-[1fr_min-content_1fr] mb-10">
@@ -19,7 +20,11 @@ export default function ProfileBanner({
         {belongsToCurrUser ? (
           <EditProfileButton />
         ) : (
-          <FollowProfileButton isFollowing={isFollowing} />
+          <FollowProfileButton
+            username={profileData.username}
+            isFollowing={isFollowing}
+            toggleFollowStatus={toggleFollowStatus}
+          />
         )}
       </div>
       <div className="col-start-2 col-end-3 row-start-1 row-end-1 self-end text-2xl leading-tight">

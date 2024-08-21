@@ -120,4 +120,44 @@ const deletePost = async (req, res, next) => {
   }
 };
 
-module.exports = { createPost, getPost, updatePost, deletePost };
+const getFollowingPosts = async (req, res, next) => {
+  const { userId: clerkId } = req.auth;
+  const { page, limit } = req.query;
+
+  try {
+    let posts;
+
+    if (page && limit) {
+      posts = await Posts.getPaginatedFollowingPostsByClerkId(
+        clerkId,
+        page,
+        limit
+      );
+    }
+
+    posts = await Promise.all(
+      posts.map(async (post) => {
+        post.image_url = await getPresignedUrl(post.image_url);
+        post = camelizeKeys(post);
+        return post;
+      })
+    );
+
+    res.status(200).send({
+      status: 'success',
+      data: {
+        posts,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports = {
+  createPost,
+  getPost,
+  updatePost,
+  deletePost,
+  getFollowingPosts,
+};

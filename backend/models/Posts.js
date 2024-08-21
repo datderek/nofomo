@@ -107,6 +107,16 @@ class Posts {
 
     return result;
   }
+
+  static async getPaginatedFollowingPostsByClerkId(clerkId, page, limit) {
+    const offset = ((page - 1) * limit).toString();
+
+    const sql =
+      'SELECT `posts`.* FROM `posts` INNER JOIN `followers` ON `posts`.`user_id` = `followers`.`followed_user_id` INNER JOIN `users` ON `followers`.`following_user_id` = `users`.`id` WHERE `users`.`clerk_id` = ? ORDER BY `created_at` DESC LIMIT ? OFFSET ?';
+    const [result] = await db.execute(sql, [clerkId, limit, offset]);
+
+    return result;
+  }
 }
 
 module.exports = Posts;

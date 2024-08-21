@@ -7,12 +7,16 @@ const {
   getPost,
   updatePost,
   deletePost,
+  getFollowingPosts,
 } = require('../controllers/postController');
 
 const router = express.Router();
 
 // Create a new post belonging to the concurrent user
 router.post('/', requireAuth, upload.single('image'), validatePost, createPost);
+
+// Get all posts created by users that the current authenticated user if following
+router.get('/following', requireAuth, getFollowingPosts);
 
 // Get a post by id
 router.get('/:postId', requireAuth, getPost);

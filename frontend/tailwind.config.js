@@ -2,7 +2,11 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      spacing: {
+        navbar: '5rem', // Spacing from top to accomodate for navbar
+      },
+    },
   },
   plugins: [],
 };

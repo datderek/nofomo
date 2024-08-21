@@ -18,7 +18,7 @@ export default function ProtectedLayout() {
     return (
       <>
         <Navbar />
-        <div className="h-screen pt-20">
+        <div className="h-screen pt-navbar">
           <Outlet context={[user, getToken]} />
         </div>
       </>

@@ -3,7 +3,7 @@ import { SignedIn, UserButton } from '@clerk/clerk-react';
 
 export default function Navbar() {
   return (
-    <nav className="fixed h-14 w-full">
+    <nav className="fixed h-14 w-full bg-white">
       <div className="mx-auto h-full max-w-[900px] px-8 flex justify-center items-center">
         <div className="flex-none mr-12">
           <Link to="/dashboard">

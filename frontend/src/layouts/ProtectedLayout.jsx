@@ -19,7 +19,7 @@ export default function ProtectedLayout() {
       <>
         <Navbar />
         <div className="h-screen pt-20">
-          <Outlet context={[user, getToken]} />;
+          <Outlet context={[user, getToken]} />
         </div>
       </>
     );

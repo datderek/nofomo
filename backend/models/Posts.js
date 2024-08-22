@@ -112,7 +112,7 @@ class Posts {
     const offset = ((page - 1) * limit).toString();
 
     const sql =
-      'SELECT `posts`.* FROM `posts` INNER JOIN `followers` ON `posts`.`user_id` = `followers`.`followed_user_id` INNER JOIN `users` ON `followers`.`following_user_id` = `users`.`id` WHERE `users`.`clerk_id` = ? ORDER BY `created_at` DESC LIMIT ? OFFSET ?';
+      'SELECT `posts`.*,`users`.`image_url` AS `pfp_url`,`users`.`username` FROM `followers` JOIN `users` AS `FollowingUser` ON `followers`.`following_user_id` = `FollowingUser`.`id` JOIN `users` AS `FollowedUser` ON `followers`.`followed_user_id` = `FollowedUser`.`id` JOIN `posts` ON `posts`.`user_id` = `FollowedUser`.`id` JOIN `users` ON `posts`.`user_id` = `users`.`id` WHERE `FollowingUser`.`clerk_id` = ? ORDER BY `created_at` DESC LIMIT ? OFFSET ?';
     const [result] = await db.execute(sql, [clerkId, limit, offset]);
 
     return result;

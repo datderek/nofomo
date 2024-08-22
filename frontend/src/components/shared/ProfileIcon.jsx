@@ -1,7 +1,7 @@
 import { useOutletContext } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-export function ProfileIcon({ width = 40 }) {
+export default function ProfileIcon({ width = 40 }) {
   const [currUser] = useOutletContext();
 
   return (

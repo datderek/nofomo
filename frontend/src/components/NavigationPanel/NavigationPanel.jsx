@@ -1,4 +1,4 @@
-import { ProfileIcon } from '../shared/ProfileIcon';
+import ProfileIcon from '../shared/ProfileIcon';
 
 export default function NavigationPanel() {
   return (

@@ -11,7 +11,7 @@ export default function ProfileBanner({
     <div className="w-full px-4 py-2 grid grid-cols-3 grid-rows-[1fr_min-content_1fr] mb-10">
       <div className="col-span-1 row-span-full mx-auto">
         <img
-          className="h-[150px] aspect-square rounded-full bg-gray-300"
+          className="h-[150px] aspect-square rounded-full border bg-gray-300"
           src={profileData.imageUrl}
           alt={`Profile picture of ${profileData.username}`}
         />

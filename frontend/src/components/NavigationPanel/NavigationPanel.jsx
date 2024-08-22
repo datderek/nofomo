@@ -4,7 +4,7 @@ export default function NavigationPanel() {
   return (
     <div className="sticky top-navbar h-min p-2">
       <div className="flex flex-col gap-y-4 items-center w-full">
-        <ProfileIcon width={150} />
+        <ProfileIcon width={'h-36'} />
         <div>
           <div className="text-center text-2xl font-medium">Derek Tran</div>
           <div className="text-center">@datderek</div>

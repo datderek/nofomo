@@ -1,18 +1,10 @@
-import { useOutletContext } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { ProfileIcon } from '../shared/ProfileIcon';
 
 export default function NavigationPanel() {
-  const [currUser] = useOutletContext();
-
   return (
     <div className="sticky top-navbar h-min p-2">
       <div className="flex flex-col gap-y-4 items-center w-full">
-        <Link to={`/${currUser.username}`}>
-          <img
-            src={currUser.imageUrl}
-            className="h-[150px] w-[150px] rounded-full border bg-gray-300"
-          />
-        </Link>
+        <ProfileIcon width={150} />
         <div>
           <div className="text-center text-2xl font-medium">Derek Tran</div>
           <div className="text-center">@datderek</div>

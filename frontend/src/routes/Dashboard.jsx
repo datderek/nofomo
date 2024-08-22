@@ -9,7 +9,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <div className="w-screen min-h-screen flex justify-center">
+      <div className="w-screen h-min flex justify-center">
         <div className="max-w-[1200px] h-min w-full grid grid-cols-[250px_1fr_250px] gap-x-6">
           <NavigationPanel />
           <Feed

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import PostForm from './PostForm';
 
 const isClickInsideRectangle = (e, element) => {
   const r = element.getBoundingClientRect();
@@ -11,7 +12,7 @@ const isClickInsideRectangle = (e, element) => {
   );
 };
 
-export default function PostFormModal({ isOpen, onSubmit, onClose, children }) {
+export default function PostFormModal({ isOpen, onClose }) {
   const ref = useRef(null);
 
   useEffect(() => {
@@ -24,11 +25,6 @@ export default function PostFormModal({ isOpen, onSubmit, onClose, children }) {
     }
   }, [isOpen]);
 
-  const submitAndClose = () => {
-    onSubmit();
-    onClose();
-  };
-
   return (
     <dialog
       ref={ref}
@@ -36,14 +32,18 @@ export default function PostFormModal({ isOpen, onSubmit, onClose, children }) {
       onClick={(e) =>
         ref.current && !isClickInsideRectangle(e, ref.current) && onClose()
       }
-      className="w-min p-4 overflow-visible border rounded-lg backdrop:bg-black backdrop:bg-opacity-70"
+      className="w-min p-4 pt-4 overflow-visible border rounded-lg backdrop:bg-black backdrop:bg-opacity-70"
     >
-      {children}
-
-      <div className="flex gap-5">
-        <button onClick={submitAndClose}>Submit</button>
-        <button onClick={onClose}>Close</button>
-      </div>
+      <button onClick={onClose} className="absolute top-2 right-2">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 -960 960 960"
+          className="h-5 w-5 fill-black-500"
+        >
+          <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+        </svg>
+      </button>
+      <PostForm onSubmit={onClose} />
     </dialog>
   );
 }

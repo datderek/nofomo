@@ -1,6 +1,7 @@
 export default function FileInput({ name, label, register, options, invalid }) {
   return (
-    <div>
+    <div className="my-2">
+      <label htmlFor={name}>{label}</label>
       <input
         id={name}
         type="file"
@@ -8,7 +9,6 @@ export default function FileInput({ name, label, register, options, invalid }) {
         {...register(name, options)}
         aria-invalid={invalid}
       />
-      <label htmlFor={name}>{label}</label>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import TextInput from './TextInput.jsx';
 import TextAreaInput from './TextAreaInput.jsx';
 import ErrorMessage from './ErrorMessage.jsx';
 
-export default function PostForm() {
+export default function PostForm({ onSubmit }) {
   const {
     control,
     register,
@@ -56,6 +56,7 @@ export default function PostForm() {
       if (response.ok) {
         // TODO: Redirect on success
         reset();
+        onSubmit();
       } else {
         const body = await response.json();
         setServerErrors(Object.values(body.data.errors));
@@ -130,7 +131,7 @@ export default function PostForm() {
       />
       <ErrorMessage error={errors.body} />
 
-      <div className={'flex justify-center my-2'}>
+      <div className={'flex justify-center my-2 gap-2'}>
         <DateTimeInput name="eventStart" label="From" control={control} />
         <DateTimeInput
           name="eventEnd"

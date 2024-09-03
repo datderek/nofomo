@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import ProfileIcon from '../shared/ProfileIcon';
-import PostForm from './PostForm';
 import PostFormModal from './PostFormModal';
 
 export default function CreatePostButton() {
@@ -12,10 +11,6 @@ export default function CreatePostButton() {
 
   const handleClose = () => {
     setIsOpen(false);
-  };
-
-  const onSubmit = () => {
-    console.log('Submit clicked');
   };
 
   return (
@@ -31,9 +26,7 @@ export default function CreatePostButton() {
           Got something to share?
         </div>
       </div>
-      <PostFormModal isOpen={isOpen} onSubmit={onSubmit} onClose={handleClose}>
-        <PostForm />
-      </PostFormModal>
+      <PostFormModal isOpen={isOpen} onClose={handleClose} />
     </>
   );
 }

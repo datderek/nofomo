@@ -8,6 +8,7 @@ import SignInPage from '../routes/SignIn';
 import SignUpPage from '../routes/SignUp';
 import DashboardPage from '../routes/Dashboard';
 import ProfilePage from './Profile';
+import PostPage from './Post';
 
 const routes = [
   {
@@ -21,6 +22,7 @@ const routes = [
         children: [
           { path: '/dashboard', element: <DashboardPage /> },
           { path: '/:username', element: <ProfilePage /> },
+          { path: '/post/:postId', element: <PostPage /> },
         ],
       },
     ],

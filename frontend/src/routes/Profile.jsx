@@ -30,7 +30,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <>
+    <div className="max-w-[750px] mx-auto">
       <ProfileBanner
         profileData={profileData}
         belongsToCurrUser={currUser.username === username}
@@ -42,6 +42,6 @@ export default function ProfilePage() {
         handleLoadMore={loadMorePosts}
         hasMore={hasMorePosts}
       />
-    </>
+    </div>
   );
 }

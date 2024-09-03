@@ -32,12 +32,12 @@ export default function DateTimeInput({ name, label, control, rules }) {
             showTimeSelect
             timeIntervals={15}
             timeFormat="HH:mm"
-            dateFormat="MMMM d, yyyy h:mm aa"
+            dateFormat="MMM d, yyyy h:mm aa"
             onChange={onChange}
             selected={value}
             enableTabLoop={false}
             customInput={
-              <CustomInput className="mx-2 w-52 h-8 px-2 rounded border border-gray-400 text-black text-center" />
+              <CustomInput className="w-52 h-8 px-2 rounded border border-gray-400 text-black text-center" />
             }
           />
         )}

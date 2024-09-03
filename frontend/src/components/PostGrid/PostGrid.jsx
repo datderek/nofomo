@@ -1,4 +1,4 @@
-import LoadMore from './LoadMore';
+import LoadMore from '../shared/LoadMore';
 import Post from './Post';
 
 export default function PostGrid({ posts, handleLoadMore, hasMore }) {
